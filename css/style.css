@@ -1,0 +1,104 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: black;
+}
+
+main {
+    position: fixed;
+    display: inline-block;
+    border: 1px solid red;
+    background: linear-gradient(#53BFF5, #A0599B);
+}
+
+.chat {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-block;
+    width: 30%;
+    height: 30vh;
+    color: white;
+    font-family: 'Poppins Bold';
+    font-size: 24px;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2%;
+    overflow-x: auto;
+    border-bottom-right-radius: 30px;
+    box-shadow: 4px 4px 10px black;
+}
+
+.chat p {
+    display: inline-block;
+    color: black;
+}
+
+.playerChar {
+    position: absolute;
+    display: inline-block;
+    width: 150px;
+    height: 200px;
+    bottom: 30px;
+    font-family: 'Poppins Bold';
+    text-align: center;
+    color: whitesmoke;
+    z-index: 3;
+}
+
+.char1 {
+    background: url(../img/char1.png);
+    background-size: 150px 150px;
+    width: 150px;
+    height: 150px;
+}
+
+.char2 {
+    background: url(../img/char2.png);
+    background-size: 150px 150px;
+    width: 150px;
+    height: 150px;
+}
+
+.char3 {
+    background: url(../img/char3.png);
+    background-size: 150px 150px;
+    width: 150px;
+    height: 150px;
+}
+
+.char4 {
+    background: url(../img/char4.png);
+    background-size: 150px 150px;
+    width: 150px;
+    height: 150px;
+}
+
+.sword1 {
+    position: absolute;
+    bottom: -15px;
+    left: 20px;
+    background: url(../img/charB1.png);
+    background-size: 445px 445px;
+    background-position: 3px -165px;
+    width: 70px;
+    height: 70px;
+}
+
+.cenario1 {
+    position: absolute;
+    display: inline-block;
+    background: url(../img/cena1.png);
+    background-size: 100% 100%;
+    width: 100%;
+    height: 90vh;
+    bottom: -20px;
+}
+
+@font-face {
+    font-family: Poppins Bold;
+    src: url('../font/Poppins-SemiBold.ttf');
+}
