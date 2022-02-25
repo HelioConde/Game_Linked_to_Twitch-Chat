@@ -41,26 +41,33 @@ ComfyJS.onChat = (user, message, flags, self, extra) => {
             loadGame();
         } else {
             playerName = JSON.parse(localStorage.getItem('players'));
+            let created = true;
             for (obj in playerName) {
                 if (playerName[obj].player.nome == user) {
+                    created = false;
                     console.log("// Erro create character //");
-                } else {
-                    playerName.push({
-                        'player': {
-                            nome: user,
-                            char: playerChar,
-                            level: 0,
-                            ataque: 1,
-                            velocidade: 1,
-                            defesa: 1,
-                            vida: 1
-                        }
-                    });
-                    localStorage.setItem('players', JSON.stringify(playerName));
-                    console.log("Created character!");
-                    loadGame();
                     return;
                 }
+            }
+
+            if (created == true) {
+                playerName.push({
+                    'player': {
+                        nome: user,
+                        char: playerChar,
+                        level: 0,
+                        ataque: 1,
+                        velocidade: 1,
+                        defesa: 1,
+                        vida: 1
+                    }
+                });
+                localStorage.setItem('players', JSON.stringify(playerName));
+                console.log("Created character!");
+                loadGame();
+            } else {
+                console.log("// Erro create character //");
+                return;
             }
         }
     }
@@ -68,9 +75,15 @@ ComfyJS.onChat = (user, message, flags, self, extra) => {
     // Subir o Nivel //
     if (extra.customRewardId == "889e0b60-695a-410b-a667-113a19f7218b") {
         playerName = JSON.parse(localStorage.getItem('players'));
-        playerName[0].player.level = parseFloat(playerName[0].player.level + 1);
-        localStorage.setItem('players', JSON.stringify(playerName));
-        console.log("Level Up")
+        for (obj in playerName) {
+            if (playerName[obj].player.nome == user) {
+                playerName[obj].player.level = parseFloat(playerName[obj].player.level + 1);
+                localStorage.setItem('players', JSON.stringify(playerName));
+                console.log("Level Up")
+                loadGame();
+                return;
+            }
+        }
     }
 }
 ComfyJS.Init("alchemy_flames");
@@ -95,11 +108,16 @@ function loadGame() {
     players.innerHTML = "";
 
     playerName = JSON.parse(localStorage.getItem('players'));
-    
+
     let left = 0;
     for (obj in playerName) {
         let bottom = parseInt(Math.random() * (75 - 1));
-        players.innerHTML = players.innerHTML + '<div class="playerChar" style="left:' + left + 'px;bottom:' + bottom + 'px;" alt="' + obj + '"><div class="playerName">' + playerName[obj].player.nome + '</div><div class="playerLevel">Level ' + playerName[obj].player.level + '</div><div class="char' + playerName[obj].player.char + '"></div><div class="sword1"></div></div>';
+        players.innerHTML = players.innerHTML + `<div class="playerChar" style="left:` + left + `px;bottom:` + bottom + `px;" alt="' + obj + '">
+        <div class="playerName">` + playerName[obj].player.nome + `</div>
+        <div class="playerLevel">Level ` + playerName[obj].player.level + `</div>
+        <div class="char` + playerName[obj].player.char + `"></div>
+        <div class="sword1"></div>
+        </div>`;
         left = left + 150;
     }
 }

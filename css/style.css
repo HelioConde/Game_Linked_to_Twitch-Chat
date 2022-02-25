@@ -77,6 +77,13 @@ main {
     height: 150px;
 }
 
+.char5 {
+    background: url(../img/char4.png);
+    background-size: 150px 150px;
+    width: 150px;
+    height: 150px;
+}
+
 .sword1 {
     position: absolute;
     bottom: -15px;
