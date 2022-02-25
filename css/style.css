@@ -40,8 +40,8 @@ main {
 .playerChar {
     position: absolute;
     display: inline-block;
-    width: 150px;
-    height: 200px;
+    width: 100px;
+    height: 150px;
     bottom: 30px;
     font-family: 'Poppins Bold';
     text-align: center;
@@ -49,50 +49,122 @@ main {
     z-index: 3;
 }
 
+.char1, .char2, .char3, .char4, .char5,
+.char6, .char7, .char8, .char9, .char10,
+.char11, .char12, .char13, .char14, .char15,
+.char16, .char17, .char18, .char19, .char20 {
+    width: 100px;
+    height: 100px;
+}
+
 .char1 {
-    background: url(../img/char1.png);
-    background-size: 150px 150px;
-    width: 150px;
-    height: 150px;
+    background: url(../img/charB1.png);
+    background-size: 300px 300px;
 }
 
 .char2 {
-    background: url(../img/char2.png);
-    background-size: 150px 150px;
-    width: 150px;
-    height: 150px;
+    background: url(../img/charB2.png);
+    background-size: 300px 300px;
 }
 
 .char3 {
-    background: url(../img/char3.png);
-    background-size: 150px 150px;
-    width: 150px;
-    height: 150px;
+    background: url(../img/charB3.png);
+    background-size: 300px 300px;
 }
 
 .char4 {
-    background: url(../img/char4.png);
-    background-size: 150px 150px;
-    width: 150px;
-    height: 150px;
+    background: url(../img/charB4.png);
+    background-size: 300px 300px;
 }
 
 .char5 {
-    background: url(../img/char4.png);
-    background-size: 150px 150px;
-    width: 150px;
-    height: 150px;
+    background: url(../img/charB5.png);
+    background-size: 300px 300px;
+}
+
+.char6 {
+    background: url(../img/charB6.png);
+    background-size: 300px 300px;
+}
+
+.char7 {
+    background: url(../img/charB7.png);
+    background-size: 300px 300px;
+}
+
+.char8 {
+    background: url(../img/charB8.png);
+    background-size: 300px 300px;
+}
+
+.char9 {
+    background: url(../img/charB9.png);
+    background-size: 300px 300px;
+}
+
+.char10 {
+    background: url(../img/charB10.png);
+    background-size: 300px 300px;
+}
+
+.char11 {
+    background: url(../img/charB11.png);
+    background-size: 300px 300px;
+}
+
+.char12 {
+    background: url(../img/charB12.png);
+    background-size: 300px 300px;
+}
+
+.char13 {
+    background: url(../img/charB13.png);
+    background-size: 300px 300px;
+}
+
+.char14 {
+    background: url(../img/charB14.png);
+    background-size: 300px 300px;
+}
+
+.char15 {
+    background: url(../img/charB15.png);
+    background-size: 300px 300px;
+}
+
+.char16 {
+    background: url(../img/charB16.png);
+    background-size: 300px 300px;
+}
+
+.char17 {
+    background: url(../img/charB17.png);
+    background-size: 300px 300px;
+}
+
+.char18 {
+    background: url(../img/charB18.png);
+    background-size: 300px 300px;
+}
+
+.char19 {
+    background: url(../img/charB19.png);
+    background-size: 300px 300px;
+}
+
+.char20 {
+    background: url(../img/charB20.png);
+    background-size: 300px 300px;
 }
 
 .sword1 {
     position: absolute;
-    bottom: -15px;
-    left: 20px;
-    background: url(../img/charB1.png);
-    background-size: 445px 445px;
-    background-position: 3px -165px;
-    width: 70px;
-    height: 70px;
+    bottom: -13px;
+    left: 8px;
+    background: url(../img/sword1.png);
+    background-size: 50px 50px;
+    width: 50px;
+    height: 50px;
 }
 
 .cenario1 {
