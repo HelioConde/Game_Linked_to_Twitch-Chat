@@ -12,6 +12,7 @@ main {
     display: inline-block;
     border: 1px solid red;
     background: linear-gradient(#53BFF5, #A0599B);
+    background: green;
 }
 
 .chat {
@@ -167,6 +168,110 @@ main {
     height: 50px;
 }
 
+.player1 {
+    position: absolute;
+    display: inline-block;
+    width: 200px;
+    height: 250px;
+    left: 0%;
+    right: 35%;
+    top: 50%;
+    margin: auto;
+    transform: translate(0, -60%);
+    font-family: 'Poppins Bold';
+    text-align: center;
+    color: whitesmoke;
+    z-index: 3;
+}
+
+.player2 {
+    position: absolute;
+    display: inline-block;
+    width: 200px;
+    height: 250px;
+    left: 35%;
+    right: 0%;
+    top: 50%;
+    margin: auto;
+    transform: translate(0, -60%);
+    font-family: 'Poppins Bold';
+    text-align: center;
+    color: whitesmoke;
+    z-index: 3;
+}
+
+.char {
+    background-size: 600px 600px;
+    width: 200px;
+    height: 200px;
+}
+
+.player1 .sword {
+    background-size: 100px 100px;
+    width: 100px;
+    height: 100px;
+    bottom: -12px;
+    left: 20px;
+}
+
+.player2 .char {
+    transform: scaleX(-1);
+}
+
+.player2 .sword {
+    background-size: 100px 100px;
+    width: 100px;
+    height: 100px;
+    bottom: -12px;
+    left: auto;
+    right: 0px;
+    transform: scaleX(-1);
+}
+
+.pvp {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 100%;
+    text-align: center;
+    font-family: 'Poppins Bold';
+    top: 50%;
+    transform: translate(0, -50%);
+    z-index: 2;
+}
+
+.pvp .vs {
+    font-size: 200px;
+}
+
+.pvp .vs span:nth-child(1) {
+    font-size: 150px;
+    left: 0px;
+    right: 10%;
+    top: 50%;
+    transform: translate(0, -56%);
+    position: absolute;
+}
+
+.pvp .vs span:nth-child(2) {
+    font-size: 150px;
+    left: 0px;
+    right: 0;
+    top: 50%;
+    transform: translate(0, -40%);
+    position: absolute;
+}
+
+.pvp .vs span:nth-child(3) {
+    font-size: 150px;
+    left: 10%;
+    right: 0%;
+    top: 60%;
+    transform: translate(0, -28%);
+    position: absolute;
+}
+
 .cenario1 {
     position: absolute;
     display: inline-block;
@@ -175,6 +280,73 @@ main {
     width: 100%;
     height: 90vh;
     bottom: -20px;
+}
+
+#player1 {
+    position: absolute;
+    display: inline-block;
+    width: 100px;
+    height: 150px;
+    font-family: 'Poppins Bold';
+    text-align: center;
+    color: whitesmoke;
+    z-index: 3;
+    left: 0;
+    right: 25%;
+    margin: auto;
+}
+
+#player2 {
+    position: absolute;
+    display: inline-block;
+    width: 100px;
+    height: 150px;
+    font-family: 'Poppins Bold';
+    text-align: center;
+    color: whitesmoke;
+    z-index: 3;
+    left: 25%;
+    right: 0;
+    margin: auto;
+}
+
+.charControl {
+    transform: scaleX(-1);
+}
+
+.swordControl {
+    transform: scaleX(-1);
+    left: auto;
+    right: 0;
+}
+
+.fight {
+    position: absolute;
+    width: 100%;
+    height: 160px;
+    bottom: 0;
+}
+
+.pvp .player1 .playerName {
+    display: inline-block;
+    width: 10px;
+    height: 25px;
+}
+
+.pvp .player1 .playerLevel {
+    display: inline-block;
+    width: 10px;
+    height: 25px;
+}
+
+.vida {
+    background: rgb(0, 139, 0);
+}
+
+.win i {
+    font-family: 'Poppins Bold';
+    font-size: 30px;
+    font-weight: bolder;
 }
 
 @font-face {
