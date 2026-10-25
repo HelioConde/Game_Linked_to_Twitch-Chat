@@ -12,8 +12,9 @@ var x1 = false;
 
 ComfyJS.onChat = (user, message, flags, self, extra) => {
     extra = extra || {};
-    user = String(user || '').slice(0, 50);
+    user = String(user || '').replace(/[^a-zA-Z0-9_]/g, '').slice(0, 25);
     message = String(message || '').slice(0, 500);
+    if (!user) return;
 
     /* $(".chat").append('<div> <p>' + user + '</p>: ' + message + '</div>'); */
     message = message.replaceAll(/>/g, '')
