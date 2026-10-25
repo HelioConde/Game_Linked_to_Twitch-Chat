@@ -27,7 +27,7 @@
   <main id="main" class="shell">
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 4.0</p>
+        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 5.0</p>
         <h1 id="page-title">Seu chat. <span>Uma arena.</span><br>Infinitas histórias.</h1>
         <p class="subtitle">Ganhe experiência em treinos e duelos, compre equipamentos, escolha habilidades e dispute o ranking antes de integrar a Twitch.</p>
       </div>
@@ -43,6 +43,13 @@
       <div class="stat-card"><span>Maior nível</span><strong id="stat-level">0</strong><small>Progressão do grupo</small></div>
       <div class="stat-card stat-highlight"><span>Integração</span><strong>SIMULADA</strong><small>Pronto para experimentar</small></div>
     </section>
+
+
+    <div id="obsBar" class="obs-bar" aria-label="Informações do overlay OBS" aria-live="polite">
+      <div class="obs-brand">✦ CHAT ARENA <span id="obsConnection">DEMONSTRAÇÃO</span></div>
+      <strong id="obsPlayerCount">0 aventureiros</strong>
+    </div>
+    <button type="button" id="obsExit" class="obs-exit" hidden aria-label="Sair do modo OBS">Sair do modo OBS · Esc</button>
 
     <div class="dashboard">
       <section class="main-column" aria-label="Jogo">
@@ -96,6 +103,23 @@
       </section>
 
       <aside class="side-column">
+        <section class="panel obs-settings-panel" aria-labelledby="obs-heading">
+          <div class="panel-heading">
+            <div><p class="eyebrow">OBS STUDIO / TRANSMISSÃO</p><h2 id="obs-heading">Modo overlay</h2></div>
+            <span class="test-badge">TRANSPARENTE</span>
+          </div>
+          <div class="obs-settings">
+            <p class="panel-description">Exiba personagens e combates sobre sua live, sem o painel ou fundo do cenário.</p>
+            <button type="button" class="button button-primary" id="obsEnter" aria-pressed="false">Ativar modo OBS nesta aba</button>
+            <p class="obs-help"><strong>Para chat real:</strong> conecte a Twitch acima, ative o modo OBS e no OBS Studio utilize <strong>Captura de janela</strong> desta mesma janela do navegador. Pressione <kbd>Esc</kbd> para voltar ao painel. A autenticação permanece na aba.</p>
+            <div class="obs-preview-box">
+              <strong>Browser Source (prévia offline)</strong>
+              <p>Abra a URL abaixo em uma fonte Navegador do OBS. Exibe personagens de demonstração, sem sincronizar o chat real ou tokens entre navegadores.</p>
+              <code id="obsPreviewUrl" class="twitch-redirect"></code>
+              <button type="button" id="obsCopy" class="button button-secondary">Copiar URL da prévia</button>
+            </div>
+          </div>
+        </section>
         <section class="panel twitch-panel" aria-labelledby="twitch-heading">
           <div class="panel-heading">
             <div><p class="eyebrow">03 / TWITCH EVENTSUB</p><h2 id="twitch-heading">Conectar chat real</h2></div>
