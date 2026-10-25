@@ -1,15 +1,31 @@
+function readPlayers() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem('players') || '[]');
+        return Array.isArray(parsed) ? parsed.filter(item => item && item.player && typeof item.player.nome === 'string') : [];
+    } catch (error) {
+        console.warn('Dados de jogadores inválidos; carregando lista vazia.', error);
+        return [];
+    }
+}
+
 var x1 = false;
 
 ComfyJS.onChat = (user, message, flags, self, extra) => {
-    console.log(extra);
+    extra = extra || {};
+    user = String(user || '').replace(/[^a-zA-Z0-9_]/g, '').slice(0, 25);
+    message = String(message || '').slice(0, 500);
+    if (!user) return;
 
     /* $(".chat").append('<div> <p>' + user + '</p>: ' + message + '</div>'); */
     message = message.replaceAll(/>/g, '')
     message = message.replaceAll(/</g, '')
     let chat = document.getElementsByClassName('chat')[0];
-    chat.innerHTML =
-        chat.innerHTML +
-        '<div> <p>' + user + '</p>: ' + message + '</div>'
+    const entry = document.createElement('div');
+    const name = document.createElement('p');
+    name.textContent = user;
+    entry.append(name, document.createTextNode(': ' + message));
+    chat.appendChild(entry);
+    while (chat.children.length > 100) chat.firstElementChild.remove();
     $('.chat').animate({
         scrollTop: '10000'
     });
@@ -229,7 +245,7 @@ function loadGame() {
     let players = document.getElementsByClassName('players')[0];
     players.innerHTML = "";
 
-    playerName = JSON.parse(localStorage.getItem('players'));
+    playerName = readPlayers();
 
     let left = 0;
     let bottom;
@@ -283,7 +299,8 @@ function pvp(valor1, valor2) {
 
     players.innerHTML = "";
     $(".players").append('<div class="pvp"></div>');
-    let playerName = JSON.parse(localStorage.getItem('players'));
+    let playerName = readPlayers();
+    if (!playerName.some(p => p.player.nome === valor1) || !playerName.some(p => p.player.nome === valor2) || valor1 === valor2) { x1 = false; return; }
     for (obj in playerName) {
         if (playerName[obj].player.nome == valor1) {
             if (player1 == "") {
@@ -357,8 +374,8 @@ function pvp(valor1, valor2) {
 
     let vidaPlayer1 = parseInt(playerName[player1[0]].player.vida + 5);
     let vidaPlayer2 = parseInt(playerName[player2[0]].player.vida + 5);
-    let timerPlayer1 = parseInt(1000 - playerName[player1[0]].player.velocidade);
-    let timerPlayer2 = parseInt(1000 - playerName[player2[0]].player.velocidade);
+    let timerPlayer1 = Math.max(250, 1000 - Number(playerName[player1[0]].player.velocidade || 0));
+    let timerPlayer2 = Math.max(250, 1000 - Number(playerName[player2[0]].player.velocidade || 0));
     let timer1;
     let timer2;
 
@@ -399,7 +416,7 @@ function pvp(valor1, valor2) {
             clearInterval(timer2);
             console.log('Player1 Win');
             console.log(vidaPlayer1);
-            if (playerName[0].player.win == undefined) {
+            if (playerName[player1[0]].player.win == undefined) {
                 playerName[player1[0]].player.win = 1;
                 console.log('undfined');
             } else {
@@ -461,7 +478,7 @@ function pvp(valor1, valor2) {
             clearInterval(timer2);
             console.log('Player2 Win');
             console.log(vidaPlayer2);
-            if (playerName[0].player.win == undefined) {
+            if (playerName[player2[0]].player.win == undefined) {
                 playerName[player2[0]].player.win = 1;
                 console.log('undfined');
             } else {

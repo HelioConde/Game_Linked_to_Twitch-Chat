@@ -42,3 +42,34 @@ Este é um **experimento antigo**. As integrações dependem do funcionamento at
 Possíveis próximas etapas: configuração de canal pela interface, revisão dos eventos de recompensas, persistência no servidor e segurança na renderização de mensagens do chat.
 
 Feito por [Hélio Conde](https://github.com/HelioConde).
+
+
+## Nova versão — Chat Arena (demonstração offline)
+
+Acesse **[Chat Arena](./demo/index.html)** para experimentar a interface responsiva, os 20 personagens e o sistema de duelos sem precisar conectar a Twitch. O jogo clássico continua disponível em [index.html](./index.html).
+
+### Comandos simulados
+
+| Comando | Resultado |
+| --- | --- |
+| !entrar 1 | Cria um personagem com skin de 1 a 20 |
+| !treinar | Evolui nível e atributos |
+| !skin 5 | Troca a aparência |
+| !duelo @luci | Inicia um combate entre dois aventureiros |
+| !ajuda | Consulta comandos |
+
+O botão **Adicionar aventureiros** cria exemplos para testar. A demo mantém seus dados na chave independente twitch-chat-arena-demo-v1 do armazenamento local do navegador. Se houver personagens antigos salvos na chave players, use **Importar personagens antigos**: a importação é opcional e preserva os dados de origem. O contador de duelos da demonstração é por sessão.
+
+**Atenção:** esta versão apenas simula mensagens do chat; ela não se conecta à Twitch e não oferece multiplayer online. Integração OAuth/EventSub e persistência no servidor ficam para etapas posteriores.
+
+### Testes do projeto
+
+O workflow [Validar jogo e demo](./.github/workflows/demo-ci.yml) verifica sintaxe JavaScript e executa testes com Node.js (comando: node --test tests/demo.test.mjs).
+
+### Etapas da retomada
+
+1. Auditoria e correções iniciais do legado.
+2. Interface moderna e demo offline (implementadas, pendente de QA visual).
+3. Combate e progressão avançados.
+4. Integração Twitch moderna.
+5. Publicação, QA completo e modo OBS.
