@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1020">
+  <meta name="description" content="Demonstração offline do Game Linked to Twitch Chat: crie personagens, treine e faça duelos por comandos de chat.">
+  <title>Chat Arena • Game Linked to Twitch Chat</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Pular para o jogo</a>
+  <header class="topbar">
+    <a class="brand" href="./index.html" aria-label="Chat Arena, início">
+      <span class="brand-mark" aria-hidden="true">✦</span>
+      <span><strong>CHAT<span class="brand-accent">ARENA</span></strong><small>TWITCH RPG LAB</small></span>
+    </a>
+    <div class="header-actions">
+      <span class="offline-pill"><span class="status-dot"></span> DEMO OFFLINE</span>
+      <a class="link-button" href="../index.html">Jogo clássico ↗</a>
+    </div>
+  </header>
+
+  <main id="main" class="shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 2.0</p>
+        <h1 id="page-title">Seu chat. <span>Uma arena.</span><br>Infinitas histórias.</h1>
+        <p class="subtitle">Crie aventureiros, evolua atributos e desafie outros jogadores. Teste todos os comandos antes de integrar a Twitch.</p>
+      </div>
+      <div class="intro-note">
+        <span class="note-icon" aria-hidden="true">⌘</span>
+        <div><strong>Modo laboratório</strong><p>As mensagens são simuladas neste navegador. Nenhuma conexão com a Twitch é realizada.</p></div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Resumo do jogo">
+      <div class="stat-card"><span>Aventureiros</span><strong id="stat-players">0</strong><small>Personagens criados</small></div>
+      <div class="stat-card"><span>Duelos</span><strong id="stat-duels">0</strong><small>Nesta sessão</small></div>
+      <div class="stat-card"><span>Maior nível</span><strong id="stat-level">0</strong><small>Progressão do grupo</small></div>
+      <div class="stat-card stat-highlight"><span>Integração</span><strong>SIMULADA</strong><small>Pronto para experimentar</small></div>
+    </section>
+
+    <div class="dashboard">
+      <section class="main-column" aria-label="Jogo">
+        <div class="panel arena-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">01 / MUNDO</p><h2>Arena dos aventureiros</h2></div>
+            <span class="tiny-label">Cenário e sprites originais de 2022</span>
+          </div>
+          <div class="arena" id="arena" aria-label="Cenário dos personagens">
+            <div class="scene-vignette"></div>
+            <div class="arena-title">✦ VALE DOS AVENTUREIROS ✦</div>
+            <div id="actors" class="actors"></div>
+            <div id="emptyArena" class="arena-empty"><span aria-hidden="true">⚔</span><strong>A arena está vazia</strong><small>Use !entrar ou adicione aventureiros de demonstração.</small></div>
+            <div id="duelView" class="duel-view" hidden aria-live="polite">
+              <div class="duel-heading"><span>⚔</span> DUELO EM ANDAMENTO <span>⚔</span></div>
+              <div class="fighters">
+                <div class="fighter" id="fighterLeft">
+                  <strong id="fighterLeftName"></strong>
+                  <div class="fighter-health"><div id="fighterLeftBar"></div></div>
+                  <div class="fighter-sprite" id="fighterLeftSprite"></div>
+                  <small id="fighterLeftHp"></small>
+                </div>
+                <div class="versus">VS</div>
+                <div class="fighter" id="fighterRight">
+                  <strong id="fighterRightName"></strong>
+                  <div class="fighter-health"><div id="fighterRightBar"></div></div>
+                  <div class="fighter-sprite mirror" id="fighterRightSprite"></div>
+                  <small id="fighterRightHp"></small>
+                </div>
+              </div>
+              <p id="battleLog" class="battle-log"></p>
+            </div>
+          </div>
+          <div class="arena-footer">
+            <span id="sceneCount" class="footnote">0 / 60 jogadores</span>
+            <div class="button-group">
+              <button type="button" class="button button-soft" id="importLegacy" hidden>Importar personagens antigos</button>
+              <button type="button" class="button button-secondary" id="resetDemo">Limpar demo</button>
+              <button type="button" class="button button-primary" id="seedDemo">+ Adicionar aventureiros</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel leaderboard-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">02 / EVOLUÇÃO</p><h2>Hall dos campeões</h2></div>
+            <span class="tiny-label">Ordenado por vitórias e nível</span>
+          </div>
+          <ol id="leaderboard" class="leaderboard"></ol>
+          <p id="leaderboardEmpty" class="empty-copy">Os primeiros campeões aparecerão aqui.</p>
+        </div>
+      </section>
+
+      <aside class="side-column">
+        <section class="panel simulator-panel" aria-labelledby="sim-title">
+          <div class="panel-heading">
+            <div><p class="eyebrow">03 / PAINEL DE TESTE</p><h2 id="sim-title">Simulador de chat</h2></div>
+            <span class="test-badge">● TEST MODE</span>
+          </div>
+          <p class="panel-description">Envie comandos como se fosse um espectador assistindo à transmissão.</p>
+          <form id="chatForm" novalidate>
+            <label for="username">Usuário da Twitch (simulado)</label>
+            <input id="username" name="username" maxlength="25" pattern="[a-zA-Z0-9_]+" placeholder="ex.: alchemy_flames" autocomplete="off" required value="alchemy_flames">
+            <label for="command">Mensagem no chat</label>
+            <div class="command-input">
+              <input id="command" name="command" maxlength="100" placeholder="!entrar 1" autocomplete="off" required>
+              <button type="submit" class="button button-primary" id="sendChat">Enviar <span aria-hidden="true">➜</span></button>
+            </div>
+          </form>
+          <p class="commands-caption">COMANDOS DISPONÍVEIS</p>
+          <div class="commands" aria-label="Preencher comando">
+            <button type="button" data-command="!entrar 1">!entrar 1</button>
+            <button type="button" data-command="!treinar">!treinar</button>
+            <button type="button" data-command="!skin 5">!skin 5</button>
+            <button type="button" data-command="!duelo @luci">!duelo @luci</button>
+            <button type="button" data-command="!ajuda">!ajuda</button>
+          </div>
+          <div class="chat-divider"></div>
+          <div class="chat-header"><strong>Atividade ao vivo <span>(simulada)</span></strong><button type="button" class="text-action" id="clearChat">Limpar chat</button></div>
+          <div class="chat-feed" id="chatFeed" role="log" aria-live="polite" aria-relevant="additions" aria-label="Histórico de mensagens">
+            <p class="chat-placeholder">Os eventos aparecerão aqui.</p>
+          </div>
+          <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+        </section>
+        <section class="panel roster-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">04 / ELENCO</p><h2>Personagens</h2></div>
+            <span id="rosterCount" class="tiny-label">0 registrados</span>
+          </div>
+          <div id="roster" class="roster"></div>
+          <p id="rosterEmpty" class="empty-copy">Crie um personagem com !entrar para começar.</p>
+        </section>
+      </aside>
+    </div>
+    <footer class="footer">GAME LINKED TO TWITCH CHAT · DEMO LOCAL <span>Desenvolvido a partir do projeto original • Sem autenticação ou chat Twitch real</span></footer>
+  </main>
+</body>
+</html>
