@@ -1,4 +1,6 @@
 import { MAX_PLAYERS, ITEMS, SKILLS, applyCommand, normalizeName, normalizePlayers, runDuel, settleDuel, xpToNext } from "./engine.mjs";
+import { TwitchSession } from "./twitch-client.mjs";
+import { rewardToCommand } from "./twitch-protocol.mjs";
 
 const STORAGE_KEY = "twitch-chat-arena-demo-v1";
 const $ = id => document.getElementById(id);
@@ -11,6 +13,10 @@ let players = readSaved();
 let duelCount = 0;
 let fighting = false;
 let selectedName = players[0]?.name ?? null;
+const liveQueue = [];
+const userCooldown = new Map();
+let twitchSession = null;
+let live = false;
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -211,19 +217,39 @@ async function animateDuel(challenger, opponent) {
     nodes.actors.hidden = false;
     $("seedDemo").disabled = false;
     $("resetDemo").disabled = false;
-    $("sendChat").disabled = false;
-    $("importLegacy").disabled = false;
+    $("sendChat").disabled = live;
+    $("importLegacy").disabled = live;
     fighting = false;
     render();
+    if (liveQueue.length && live) setTimeout(flushLiveQueue, 150);
   }
 }
 
-function submitCommand(sender, command) {
-  if (fighting) { logMessage("SISTEMA", "Aguarde o final do duelo.", "error"); return; }
+function flushLiveQueue() {
+  if (fighting || !live || !liveQueue.length) return;
+  const next = liveQueue.shift();
+  submitCommand(next.sender, next.command, "twitch");
+  if (!fighting && liveQueue.length) setTimeout(flushLiveQueue, 150);
+}
+
+function submitCommand(sender, command, source = "demo") {
+  if (fighting) {
+    if (source === "twitch" && liveQueue.length < 50) liveQueue.push({ sender, command });
+    else if (source === "demo") logMessage("SISTEMA", "Aguarde o final do duelo.", "error");
+    return;
+  }
   const name = normalizeName(sender);
   const text = String(command || "").trim();
   if (!name) { logMessage("SISTEMA", "Use um nome valido com letras, numeros ou _.", "error"); return; }
   if (!text) { logMessage("SISTEMA", "Digite um comando.", "error"); return; }
+  if (source === "twitch") {
+    // Evita spam de comandos e sobrecarga durante transmissões.
+    const now = Date.now();
+    const previous = userCooldown.get(name) || 0;
+    if (now - previous < 1500) return;
+    if (userCooldown.size > 400) userCooldown.clear();
+    userCooldown.set(name, now);
+  }
   logMessage(name, text);
   const outcome = applyCommand(players, name, text);
   players = outcome.players;
@@ -247,7 +273,7 @@ document.querySelectorAll("[data-command]").forEach(button => {
 });
 
 $("seedDemo").addEventListener("click", () => {
-  if (fighting) return;
+  if (fighting || live) return;
   const samples = [["alchemy_flames", 1], ["luci", 5], ["pixel_witch", 9], ["slime_keeper", 15]];
   let added = 0;
   for (const [name, skin] of samples) {
@@ -267,7 +293,7 @@ $("seedDemo").addEventListener("click", () => {
 });
 
 $("resetDemo").addEventListener("click", () => {
-  if (fighting || !window.confirm("Apagar os personagens do modo demonstracao? O jogo classico nao sera afetado.")) return;
+  if (fighting || live || !window.confirm("Apagar os personagens do modo demonstracao? O jogo classico nao sera afetado.")) return;
   players = [];
   selectedName = null;
   duelCount = 0;
@@ -288,7 +314,7 @@ function findLegacy() {
 const importedPlayers = findLegacy();
 $("importLegacy").hidden = importedPlayers.length === 0;
 $("importLegacy").addEventListener("click", () => {
-  if (fighting) return;
+  if (fighting || live) return;
   const existing = new Set(players.map(player => player.name));
   const newPlayers = findLegacy().filter(player => !existing.has(player.name));
   const space = Math.max(0, MAX_PLAYERS - players.length);
@@ -300,3 +326,54 @@ $("importLegacy").addEventListener("click", () => {
 
 render();
 logMessage("ARENA", "Demo offline iniciada. Use !entrar 1 ou Adicionar aventureiros.", "system");
+
+
+// Twitch é opt-in: o modo offline segue jogável sem autenticação.
+function updateTwitchStatus({ status, message, channel }) {
+  live = status === "connected";
+  $("twitchStatus").textContent = status === "connected" ? "AO VIVO"
+    : status === "connecting" || status === "authenticating" ? "CONECTANDO"
+    : status === "reconnecting" ? "RECONECTANDO" : status === "error" ? "ERRO" : "OFFLINE";
+  $("twitchStatus").dataset.status = status;
+  $("twitchStatusMessage").textContent = message;
+  $("twitchChannel").textContent = channel ? "Canal autorizado: " + channel : "Conecte a conta proprietária do canal.";
+  $("twitchDisconnect").hidden = status === "offline" || status === "error";
+  $("twitchConnect").disabled = ["connecting", "authenticating", "reconnecting", "connected"].includes(status);
+  $("sendChat").disabled = live || fighting;
+  $("username").disabled = live;
+  $("command").disabled = live;
+  for (const button of document.querySelectorAll("[data-command]")) button.disabled = live;
+  $("seedDemo").disabled = live || fighting;
+  $("resetDemo").disabled = live || fighting;
+  $("importLegacy").disabled = live || fighting;
+  $("liveModeNotice").hidden = !live;
+  if (!live) { liveQueue.length = 0; userCooldown.clear(); }
+}
+twitchSession = new TwitchSession({
+  onStatus: updateTwitchStatus,
+  onChat: event => {
+    // Mensagens comuns aparecem no histórico; apenas comandos acionam o RPG.
+    if (!event.text.trimStart().startsWith("!")) {
+      logMessage(event.sender, event.text.slice(0, 160));
+      return;
+    }
+    submitCommand(event.sender, event.text.slice(0, 100), "twitch");
+  },
+  onReward: event => {
+    const command = rewardToCommand(event.rewardId, event.input);
+    if (command) submitCommand(event.sender, command, "twitch");
+  }
+});
+$("twitchClientId").value = twitchSession.getCurrentClientId();
+$("twitchRedirect").textContent = twitchSession.redirectUri();
+$("twitchConnect").addEventListener("click", () => {
+  try { twitchSession.beginLogin($("twitchClientId").value, $("twitchRewards").checked); }
+  catch (error) { logMessage("TWITCH", error.message, "error"); }
+});
+$("twitchDisconnect").addEventListener("click", () => {
+  twitchSession.disconnect();
+  logMessage("TWITCH", "Chat real desconectado. O simulador está disponível.", "system");
+});
+void twitchSession.restoreRedirect().catch(error => {
+  twitchSession.disconnect("Falha ao recuperar autorização Twitch: " + error.message, "error");
+});
