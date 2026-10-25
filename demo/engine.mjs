@@ -125,7 +125,7 @@ export function parseCommand(input) {
     "!ajuda":"help", "!help":"help", "!perfil":"profile",
     "!inventario":"inventory", "!inv":"inventory",
     "!loja":"shop", "!comprar":"buy", "!equipar":"equip",
-    "!habilidade":"skill"
+    "!habilidade":"skill", "!atributo":"attribute"
   };
   return { type: commands[command] ?? "unknown", arg: parts[1] };
 }
@@ -149,6 +149,15 @@ export function applyCommand(players, sender, input) {
   if (cmd.type === "train") {
     const updated = gainExperience(player, 40);
     return { players: replace(updated), event: { type: "train", text: name + " treinou (+40 XP)." + (updated.level > player.level ? " Subiu para o nivel " + updated.level + "!" : "") } };
+  }
+  if (cmd.type === "attribute") {
+    const attribute = ({ attack: "attack", defense: "defense", health: "health", speed: "speed" })[cmd.arg];
+    if (!["attack", "defense", "health", "speed"].includes(attribute)) {
+      return result("error", "Atributo inválido.");
+    }
+    const value = Math.min(1000, Math.max(1, player[attribute]) + 1);
+    return { players: replace({ ...player, [attribute]: value }),
+      event: { type: "attribute", text: name + " melhorou " + attribute + " para " + value + "." } };
   }
   if (cmd.type === "skin") {
     const requested = Number(cmd.arg);
