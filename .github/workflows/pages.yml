@@ -43,6 +43,8 @@ jobs:
           touch _site/.nojekyll
           test -f _site/demo/index.html
           test -f _site/demo/obs-mode.mjs
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
       - name: Enviar artefato do Pages
         uses: actions/upload-pages-artifact@v4
         with:
