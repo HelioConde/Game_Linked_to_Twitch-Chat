@@ -165,7 +165,7 @@ export function applyCommand(players, sender, input) {
     return result("info", "Loja: " + Object.entries(ITEMS).filter(([, item]) => item.price > 0).map(([id, item]) => id + " (" + item.price + " moedas)").join(", ") + ".");
   }
   if (cmd.type === "buy") {
-    const item = ITEMS[cmd.arg];
+    const item = typeof cmd.arg === "string" && owns(ITEMS, cmd.arg) ? ITEMS[cmd.arg] : null;
     if (!item || item.price === 0) return result("error", "Item invalido. Use !loja.");
     if (player.inventory.includes(cmd.arg)) return result("error", "Voce ja possui este item.");
     if (player.gold < item.price) return result("error", "Moedas insuficientes para comprar " + item.name + ".");
@@ -173,7 +173,7 @@ export function applyCommand(players, sender, input) {
       event: { type: "buy", text: name + " comprou " + item.name + " por " + item.price + " moedas." } };
   }
   if (cmd.type === "equip") {
-    const item = ITEMS[cmd.arg];
+    const item = typeof cmd.arg === "string" && owns(ITEMS, cmd.arg) ? ITEMS[cmd.arg] : null;
     if (!item || !player.inventory.includes(cmd.arg)) return result("error", "Voce precisa possuir o item para equipar.");
     return { players: replace({ ...player, equipment: { ...player.equipment, [item.slot]: cmd.arg } }),
       event: { type: "equip", text: name + " equipou " + item.name + "." } };
