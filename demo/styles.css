@@ -192,3 +192,47 @@ form input:focus {border-color:var(--lime);box-shadow:0 0 0 2px #bdff7229;}
 .live-mode-notice {margin:0 22px 14px;border:1px solid #497553;border-radius:7px;padding:10px;font-size:11px;background:#21362c;color:#c3edba;}
 .commands button:disabled {opacity:.45;cursor:not-allowed;}
 @media(max-width:550px) {.twitch-content{padding:0 15px 18px;} .live-mode-notice{margin:0 15px 12px;} .twitch-content>input{font-size:16px;}}
+
+
+/* Etapa 5 — visual de transmissão e layout transparente. */
+.obs-bar,.obs-exit {display:none;}
+.obs-settings {display:grid;gap:13px;padding:0 22px 22px;}
+.obs-settings .panel-description {padding:0;margin:0;}
+.obs-help {font-size:11px;color:#c4cee2;line-height:1.7;margin:0;}
+.obs-help strong {color:#ebf3fd;}
+kbd {display:inline-block;padding:1px 6px;background:#2c354b;color:white;border:1px solid #48536d;border-radius:4px;font-family:inherit;font-size:10px;}
+.obs-preview-box {display:grid;gap:10px;padding:13px;border:1px solid #435572;border-radius:9px;background:#1c2940;min-width:0;}
+.obs-preview-box>strong {font-size:12px;color:var(--lime);}
+.obs-preview-box p {font-size:11px;color:#bccbe1;line-height:1.6;margin:0;}
+.obs-preview-box code {overflow-wrap:anywhere;}
+.obs-preview-box .button {justify-self:start;}
+body.obs-mode,html.obs-document {background:transparent!important;overflow:hidden!important;}
+body.obs-mode {margin:0;height:100dvh;}
+body.obs-mode .skip-link,body.obs-mode .topbar,body.obs-mode .intro,
+body.obs-mode .stats,body.obs-mode .side-column,body.obs-mode .leaderboard-panel,
+body.obs-mode .arena-panel>.panel-heading,body.obs-mode .arena-footer,
+body.obs-mode .footer,body.obs-mode .scene-vignette,body.obs-mode .arena-title {display:none!important;}
+body.obs-mode .shell {max-width:none;width:100%;height:100dvh;margin:0;padding:0;}
+body.obs-mode .dashboard,body.obs-mode .main-column {display:block;width:100%;height:100%;}
+body.obs-mode .arena-panel {border:0;background:transparent;box-shadow:none;border-radius:0;width:100%;height:100%;}
+body.obs-mode .arena {background:none!important;border:0;width:100%;height:100dvh;min-height:0;isolation:isolate;}
+body.obs-mode .actors {z-index:5;}
+body.obs-mode .hero {width:clamp(70px,7vw,150px);filter:drop-shadow(0 6px 8px #000c);}
+body.obs-mode .hero-name {font-size:clamp(10px,1.1vw,17px);max-width:clamp(75px,8vw,165px);text-shadow:0 2px 3px #000,0 0 10px #000,0 0 18px #000;}
+body.obs-mode .hero-level {background:#090e21c9;border-color:#c1f3ab;color:var(--lime);}
+body.obs-mode .sprite {width:clamp(75px,8.5vw,155px);height:clamp(75px,8.5vw,155px);image-rendering:pixelated;}
+body.obs-mode .obs-bar {position:fixed;z-index:30;top:2.3vh;left:2.2vw;display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#0a1127cd;border:1px solid #a5d88996;border-radius:10px;padding:10px 15px;box-shadow:0 6px 18px #0006;pointer-events:none;font-size:12px;}
+.obs-brand {font-weight:950;letter-spacing:.12em;color:#daffb9;}
+.obs-brand span {display:inline-block;color:#b9d3eb;margin-left:6px;font-size:9px;letter-spacing:.06em;}
+body.obs-mode .obs-exit {display:block;position:fixed;bottom:12px;right:12px;z-index:40;background:#0a102ce0;color:white;border:1px solid #8298b3;border-radius:8px;padding:9px 11px;font-weight:800;font-size:11px;opacity:.18;transition:opacity .12s;}
+body.obs-mode .obs-exit:hover,body.obs-mode .obs-exit:focus-visible {opacity:1;}
+body.obs-mode .arena-empty {color:#fff;}
+body.obs-mode .duel-view {inset:0;background:transparent;justify-content:flex-end;gap:3vh;padding:7vh 5vw 10vh;}
+body.obs-mode .duel-heading {background:#111b37d9;border:1px solid #58735b;border-radius:11px;padding:9px 14px;text-shadow:0 2px 4px #000;}
+body.obs-mode .fighters {max-width:800px;gap:clamp(18px,6vw,100px);padding:18px;border-radius:18px;background:#0c132ab8;}
+body.obs-mode .fighter {width:35%;}
+body.obs-mode .fighter strong {font-size:clamp(14px,2vw,30px);text-shadow:0 2px 4px #000;}
+body.obs-mode .fighter-sprite {width:clamp(95px,14vw,220px);height:clamp(95px,14vw,220px);}
+body.obs-mode .battle-log {background:#0e1431ce;border-radius:9px;padding:10px 20px;max-width:min(800px,90vw);min-height:36px;font-size:clamp(11px,1.3vw,19px);text-align:center;}
+@media(max-width:550px) {.obs-settings {padding:0 15px 18px;} body.obs-mode .obs-bar {max-width:94vw;gap:7px;padding:7px 10px;font-size:9px;} body.obs-mode .hero {width:50px;} body.obs-mode .sprite {width:55px;height:55px;} body.obs-mode .hero-name {font-size:8px;max-width:55px;} body.obs-mode .fighters {padding:10px;gap:10px;} body.obs-mode .fighter-sprite {width:80px;height:80px;} }
+@media(prefers-reduced-motion:reduce) {body.obs-mode .obs-exit {transition:none;}}

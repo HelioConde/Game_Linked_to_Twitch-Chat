@@ -1,0 +1,65 @@
+name: Publicar Chat Arena no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Checar sintaxe JavaScript
+        run: |
+          node --check demo/app.mjs
+          node --check demo/obs-mode.mjs
+          node --check demo/engine.mjs
+          node --check demo/twitch-client.mjs
+          node --check demo/twitch-protocol.mjs
+      - name: Testes unitários e estruturais
+        run: node --test tests/*.test.mjs
+
+  build:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar somente arquivos públicos
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -R demo css img js subImg font _site/
+          touch _site/.nojekyll
+          test -f _site/demo/index.html
+          test -f _site/demo/obs-mode.mjs
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+      - name: Enviar artefato do Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
