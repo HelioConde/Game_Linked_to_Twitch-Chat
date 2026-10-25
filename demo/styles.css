@@ -224,7 +224,7 @@ body.obs-mode .sprite {width:clamp(75px,8.5vw,155px);height:clamp(75px,8.5vw,155
 body.obs-mode .obs-bar {position:fixed;z-index:30;top:2.3vh;left:2.2vw;display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#0a1127cd;border:1px solid #a5d88996;border-radius:10px;padding:10px 15px;box-shadow:0 6px 18px #0006;pointer-events:none;font-size:12px;}
 .obs-brand {font-weight:950;letter-spacing:.12em;color:#daffb9;}
 .obs-brand span {display:inline-block;color:#b9d3eb;margin-left:6px;font-size:9px;letter-spacing:.06em;}
-body.obs-mode .obs-exit {position:fixed;bottom:12px;right:12px;z-index:40;background:#0a102ce0;color:white;border:1px solid #8298b3;border-radius:8px;padding:9px 11px;font-weight:800;font-size:11px;opacity:.18;transition:opacity .12s;}
+body.obs-mode .obs-exit {display:block;position:fixed;bottom:12px;right:12px;z-index:40;background:#0a102ce0;color:white;border:1px solid #8298b3;border-radius:8px;padding:9px 11px;font-weight:800;font-size:11px;opacity:.18;transition:opacity .12s;}
 body.obs-mode .obs-exit:hover,body.obs-mode .obs-exit:focus-visible {opacity:1;}
 body.obs-mode .arena-empty {color:#fff;}
 body.obs-mode .duel-view {inset:0;background:transparent;justify-content:flex-end;gap:3vh;padding:7vh 5vw 10vh;}
