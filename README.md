@@ -1,38 +1,75 @@
-# Game Linked to Twitch Chat
+# Twitch Chat Game — jogo integrado ao chat
 
-RPG 2D criado originalmente em 2022 para fazer espectadores da Twitch participarem do jogo via mensagens e recompensas de canal.
+**Protótipo de jogo para interagir com espectadores de uma transmissão da Twitch usando ComfyJS.**
 
-## Versoes disponiveis
+![JavaScript](https://img.shields.io/badge/JavaScript-vanilla-F7DF1E?logo=javascript&logoColor=black) ![Twitch](https://img.shields.io/badge/Twitch-chat-9146FF?logo=twitch&logoColor=white) ![Status](https://img.shields.io/badge/status-protótipo-64748b)
 
-- **Jogo classico:** abra [index.html](./index.html). Usa ComfyJS e o canal configurado no codigo legado. Ainda nao foi migrado para a nova API de autenticacao da Twitch.
-- **Chat Arena — demonstracao offline:** abra [demo/index.html](./demo/index.html). Interface responsiva, personagens originais, testes de comandos e duelos sem conexao com a Twitch.
+## Visão geral
 
-Para testar a demo localmente, use um servidor HTTP estatico, por exemplo: python -m http.server 8000. Depois acesse http://localhost:8000/demo/.
+A proposta é transformar interações no chat em ações dentro do jogo: cada participante pode ter um personagem, evoluir atributos e participar de desafios exibidos durante a live.
 
-## Comandos da demo
+### Mecânicas presentes no código
 
-| Comando | Efeito |
+- Leitura de mensagens do chat por meio da biblioteca **ComfyJS**.
+- Criação de personagens e troca de aparência associadas a recompensas do canal.
+- Evolução de atributos e desafios **1 contra 1**.
+- Exibição de jogadores, chat e rankings.
+- Importação, exportação e persistência de dados dos jogadores via `localStorage`.
+
+## Como testar
+
+1. Baixe ou clone o repositório.
+2. Sirva a pasta por HTTP, por exemplo com `python -m http.server 8000`.
+3. Abra `http://localhost:8000` no navegador.
+4. **Antes de usar em uma live**, revise `js/script.js` e configure a conexão do ComfyJS com seu canal. Os identificadores das recompensas presentes no código são específicos da configuração original e podem precisar de atualização.
+
+O projeto utiliza arquivos JavaScript locais, sem processo de build.
+
+## Tecnologias e estrutura
+
+| Caminho | Conteúdo |
+| --- | --- |
+| `index.html` | Interface do jogo e painéis |
+| `js/script.js` | Regras de personagens, eventos e chat |
+| `js/comfy.min.js` | Cliente ComfyJS incluído no projeto |
+| `css/` | Estilos |
+| `img/`, `subImg/`, `font/` | Recursos visuais |
+
+## Limitações e evolução
+
+Este é um **experimento antigo**. As integrações dependem do funcionamento atual da API/biblioteca da Twitch, e a autenticação/conexão ao canal não foi revalidada nesta revisão de documentação. Os saves são locais ao navegador: não existe banco de dados compartilhado.
+
+Possíveis próximas etapas: configuração de canal pela interface, revisão dos eventos de recompensas, persistência no servidor e segurança na renderização de mensagens do chat.
+
+Feito por [Hélio Conde](https://github.com/HelioConde).
+
+
+## Nova versão — Chat Arena (demonstração offline)
+
+Acesse **[Chat Arena](./demo/index.html)** para experimentar a interface responsiva, os 20 personagens e o sistema de duelos sem precisar conectar a Twitch. O jogo clássico continua disponível em [index.html](./index.html).
+
+### Comandos simulados
+
+| Comando | Resultado |
 | --- | --- |
 | !entrar 1 | Cria um personagem com skin de 1 a 20 |
-| !treinar | Aumenta o nivel e os atributos do personagem |
-| !skin 5 | Troca para uma das 20 aparencias |
-| !duelo @luci | Desafia um aventureiro presente |
-| !ajuda | Mostra os comandos disponiveis |
+| !treinar | Evolui nível e atributos |
+| !skin 5 | Troca a aparência |
+| !duelo @luci | Inicia um combate entre dois aventureiros |
+| !ajuda | Consulta comandos |
 
-Use **Adicionar aventureiros** para popular a arena sem preencher manualmente. Os personagens da demonstracao ficam na chave twitch-chat-arena-demo-v1 do armazenamento local do navegador. Se houver personagens na chave antiga players, o botao **Importar personagens antigos** permite copia-los sem apagar o original. O contador de duelos e apenas da sessao.
+O botão **Adicionar aventureiros** cria exemplos para testar. A demo mantém seus dados na chave independente twitch-chat-arena-demo-v1 do armazenamento local do navegador. Se houver personagens antigos salvos na chave players, use **Importar personagens antigos**: a importação é opcional e preserva os dados de origem. O contador de duelos da demonstração é por sessão.
 
-**Importante:** a demo simula mensagens; ela nao le o chat real da Twitch e ainda nao e um multiplayer em tempo real. A integracao com Twitch (OAuth + EventSub), persistencia no servidor e protecoes adicionais para o jogo classico sao etapas futuras.
+**Atenção:** esta versão apenas simula mensagens do chat; ela não se conecta à Twitch e não oferece multiplayer online. Integração OAuth/EventSub e persistência no servidor ficam para etapas posteriores.
 
-## Qualidade
+### Testes do projeto
 
-O fluxo de GitHub Actions verifica a sintaxe do JavaScript, confirma a existencia de assets essenciais e executa os testes do motor com Node.js sem dependencias externas: node --test tests/demo.test.mjs.
+O workflow [Validar jogo e demo](./.github/workflows/demo-ci.yml) verifica sintaxe JavaScript e executa testes com Node.js (comando: node --test tests/demo.test.mjs).
 
-## Progresso de desenvolvimento
+### Etapas da retomada
 
-- Etapa 1 — Auditoria e correcoes iniciais de seguranca/estabilidade do codigo legado.
-- Etapa 2 — Demo responsiva com comandos, personagens, PvP e rankings (implementada, pendente de QA visual).
-- Etapa 3 — Expansao de combate, progressao e balanceamento.
-- Etapa 4 — Integracao Twitch atual, com autenticacao e eventos.
-- Etapa 5 — Publicacao, testes de navegacao e modo OBS.
-
-O trabalho de modernizacao fica isolado em branch ate validacao e integracao.
+1. Auditoria e correções iniciais do legado.
+2. Interface moderna e demo offline (implementadas, pendente de QA visual).
+3. Combate e progressão avançados.
+4. Integração Twitch moderna.
+5. Publicação, QA completo e modo OBS.
