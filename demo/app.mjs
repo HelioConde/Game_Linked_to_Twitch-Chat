@@ -361,7 +361,13 @@ function submitCommand(sender, command, source = "demo") {
   if (outcome.event.type === "info" && ["!perfil", "!inventario", "!inv", "!loja"].includes(commandType)) {
     selectedName = name;
     selectWorkspace("heroes");
-    notify(commandType === "!loja" ? "Loja aberta: veja itens e preços abaixo." : "Ficha e inventário abertos.");
+    const target = commandType === "!loja" ? document.querySelector(".shop-panel") : document.querySelector(".profile-panel");
+    if (target) target.scrollIntoView({ block: "nearest", behavior: "instant" });
+    notify(commandType === "!loja" ? "Loja aberta: veja itens e preços." : "Ficha e inventário abertos.");
+  } else if (outcome.event.type === "info" && ["!ajuda", "!help"].includes(commandType)) {
+    selectWorkspace("play");
+    $("advancedCommands").open = true;
+    notify("Veja a lista em Mais comandos e escolha uma ação.");
   } else {
     logMessage("ARENA", outcome.event.text, outcome.event.type === "error" ? "error" : "system");
   }
