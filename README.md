@@ -1,72 +1,79 @@
-# Twitch Chat Game — jogo integrado ao chat
+<div align="center">
+  <h1>🎮 Chat Arena — Twitch Chat Game</h1>
+  <p><strong>Um RPG de arena em que a audiência participa, evolui personagens e enfrenta outros jogadores pelo chat.</strong></p>
+  <p>
+    <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES%20Modules-F7DF1E?logo=javascript&logoColor=black">
+    <img alt="Twitch" src="https://img.shields.io/badge/Twitch-EventSub-9146FF?logo=twitch&logoColor=white">
+    <img alt="Status" src="https://img.shields.io/badge/status-demo%20jog%C3%A1vel-64748b">
+  </p>
+  <p><a href="https://helioconde.github.io/Game_Linked_to_Twitch-Chat/demo/"><strong>Experimentar Chat Arena</strong></a> · <a href="https://helioconde.github.io/Game_Linked_to_Twitch-Chat/"><strong>Jogo original</strong></a> · <a href="#conex%C3%A3o-opcional-%C3%A0-twitch-oauth--eventsub"><strong>Conectar chat</strong></a></p>
+</div>
 
-**Protótipo de jogo para interagir com espectadores de uma transmissão da Twitch usando ComfyJS.**
+## Duas experiências no mesmo repositório
 
-![JavaScript](https://img.shields.io/badge/JavaScript-vanilla-F7DF1E?logo=javascript&logoColor=black) ![Twitch](https://img.shields.io/badge/Twitch-chat-9146FF?logo=twitch&logoColor=white) ![Status](https://img.shields.io/badge/status-protótipo-64748b)
+| Edição | Onde está | Experiência |
+| --- | --- | --- |
+| **Chat Arena (atual)** | [`demo/index.html`](demo/index.html) | RPG 2D com personagens, progresso, duelos, loja e modo de exibição OBS |
+| **Twitch Chat Game (legado)** | [`index.html`](index.html) | Experimento original baseado em ComfyJS e eventos/recompensas de chat |
 
-## Visão geral
+A versão **Chat Arena** pode ser usada em modo de **demonstração offline**, sem conta Twitch. A conexão real ao chat é opcional e exige aplicativo OAuth registrado na Twitch. **Não há servidor de jogos persistente**: progresso e interações da arena ficam no navegador onde a página está aberta.
 
-A proposta é transformar interações no chat em ações dentro do jogo: cada participante pode ter um personagem, evoluir atributos e participar de desafios exibidos durante a live.
+## Comece em poucos minutos
 
-### Mecânicas presentes no código
+**Experimentar:** abra [Chat Arena](https://helioconde.github.io/Game_Linked_to_Twitch-Chat/demo/) quando o GitHub Pages estiver publicado, ou rode localmente:
 
-- Leitura de mensagens do chat por meio da biblioteca **ComfyJS**.
-- Criação de personagens e troca de aparência associadas a recompensas do canal.
-- Evolução de atributos e desafios **1 contra 1**.
-- Exibição de jogadores, chat e rankings.
-- Importação, exportação e persistência de dados dos jogadores via `localStorage`.
+```bash
+git clone https://github.com/HelioConde/Game_Linked_to_Twitch-Chat.git
+cd Game_Linked_to_Twitch-Chat
+python -m http.server 8000
+```
 
-## Como testar
+Acesse `http://localhost:8000/demo/`. Para a edição clássica, abra `http://localhost:8000/`.
 
-1. Baixe ou clone o repositório.
-2. Sirva a pasta por HTTP, por exemplo com `python -m http.server 8000`.
-3. Abra `http://localhost:8000` no navegador.
-4. **Antes de usar em uma live**, revise `js/script.js` e configure a conexão do ComfyJS com seu canal. Os identificadores das recompensas presentes no código são específicos da configuração original e podem precisar de atualização.
+### Comandos para experimentar
 
-O projeto utiliza arquivos JavaScript locais, sem processo de build.
-
-## Tecnologias e estrutura
-
-| Caminho | Conteúdo |
+| Comando no chat simulado | O que faz |
 | --- | --- |
-| `index.html` | Interface do jogo e painéis |
-| `js/script.js` | Regras de personagens, eventos e chat |
-| `js/comfy.min.js` | Cliente ComfyJS incluído no projeto |
-| `css/` | Estilos |
-| `img/`, `subImg/`, `font/` | Recursos visuais |
+| `!entrar 1` | Cria aventureiro usando uma das 20 aparências |
+| `!treinar` | Ganha experiência e melhora atributos |
+| `!perfil` | Mostra o personagem e sua progressão |
+| `!duelo @usuario` | Inicia confronto com outro aventureiro |
+| `!loja`, `!inventario` | Consulta equipamentos e itens |
+| `!comprar espada_ferro` | Compra um equipamento com moedas |
+| `!equipar espada_ferro` | Equipa um item adquirido |
+| `!habilidade chama` | Seleciona uma das habilidades de combate |
 
-## Limitações e evolução
+A demo conta com **XP, moedas, inventário, armas, armaduras e habilidades**; o duelo calcula o resultado usando o motor da arena. As 20 aparências são escolhas visuais, não 20 classes comprovadamente distintas.
 
-Este é um **experimento antigo**. As integrações dependem do funcionamento atual da API/biblioteca da Twitch, e a autenticação/conexão ao canal não foi revalidada nesta revisão de documentação. Os saves são locais ao navegador: não existe banco de dados compartilhado.
+## Onde o código está
 
-Possíveis próximas etapas: configuração de canal pela interface, revisão dos eventos de recompensas, persistência no servidor e segurança na renderização de mensagens do chat.
+```text
+demo/
+  index.html          Interface atual
+  app.mjs             UI e comandos
+  engine.mjs          Regras de RPG e duelos
+  twitch-client.mjs   OAuth e chat EventSub
+  twitch-protocol.mjs Eventos e mapeamento de recompensas
+  obs-mode.mjs        Modo apresentação/OBS
+tests/                Testes do motor, integração e navegador
+index.html            Edição clássica
+js/                   Lógica legada com ComfyJS
+.github/workflows/    Validação e publicação
+```
 
-Feito por [Hélio Conde](https://github.com/HelioConde).
+**Qualidade:** `node --test tests/*.test.mjs` cobre testes automatizados do motor e da integração; o workflow também executa cenários Playwright. Eles não comprovam, por si só, a autenticação numa transmissão real.
 
+## Dados, privacidade e limites
 
-## Nova versão — Chat Arena (demonstração offline)
+- Personagens e progresso da demonstração usam **`localStorage`**; apagar os dados do site pode apagar o save.
+- A importação de personagens do projeto antigo é opcional e não altera a chave legada `players`.
+- **O token OAuth é mantido em memória da aba**, enquanto a conexão está ativa; não configure `Client Secret` no frontend.
+- O chat real depende de permissões e da Twitch; a aplicação precisa ficar aberta durante a transmissão.
+- O modo OBS apresenta a arena, mas **não cria um servidor 24/7** ou sincronização entre computadores.
 
-Acesse **[Chat Arena](./demo/index.html)** para experimentar a interface responsiva, os 20 personagens e o sistema de duelos sem precisar conectar a Twitch. O jogo clássico continua disponível em [index.html](./index.html).
+---
 
-### Comandos simulados
-
-| Comando | Resultado |
-| --- | --- |
-| !entrar 1 | Cria um personagem com skin de 1 a 20 |
-| !treinar | Evolui nível e atributos |
-| !skin 5 | Troca a aparência |
-| !duelo @luci | Inicia um combate entre dois aventureiros |
-| !ajuda | Consulta comandos |
-
-O botão **Adicionar aventureiros** cria exemplos para testar. A demo mantém seus dados na chave independente twitch-chat-arena-demo-v1 do armazenamento local do navegador. Se houver personagens antigos salvos na chave players, use **Importar personagens antigos**: a importação é opcional e preserva os dados de origem. O contador de duelos da demonstração é por sessão.
-
-**Atenção:** esta versão possui tanto comandos simulados quanto conexão opcional ao chat Twitch via OAuth/EventSub. Não oferece multiplayer com persistência compartilhada nem roda com a aba fechada.
-
-### Testes do projeto
-
-O workflow [Validar jogo e demo](./.github/workflows/demo-ci.yml) verifica sintaxe JavaScript, executa os testes Node (node --test tests/*.test.mjs) e valida a interface com Playwright em Chromium.
-
-### Etapa 3 — Progressão e combate RPG
+## Progressão e combate da demo
 
 A demonstração inclui sistema de **experiência (XP)**, ganho de nível, **moedas**, inventário,
 armas, armaduras e **quatro habilidades**: golpe, chama, cura e guarda.
@@ -92,7 +99,7 @@ e também importa backups de 2022, sem alterar a chave original `players`.
 Continuamos usando armazenamento **local ao navegador**, não sincronizado na nuvem.
 
 
-### Etapa 4 — Twitch real (OAuth + EventSub WebSocket)
+## Conexão opcional à Twitch (OAuth + EventSub)
 
 A demo agora tem um painel opcional **Conectar chat real**: o motor do RPG
 continua o mesmo, mas os comandos podem ser recebidos pelo EventSub da Twitch,
@@ -135,7 +142,7 @@ Documentação oficial:
 [chat](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage).
 
 
-### Etapa 5 — GitHub Pages e modo OBS
+## GitHub Pages e apresentação no OBS
 
 A nova versão fica na pasta [demo/](./demo/index.html); o jogo clássico continua no
 [index.html](./index.html). O workflow [Publicar Chat Arena no GitHub Pages](./.github/workflows/pages.yml)
