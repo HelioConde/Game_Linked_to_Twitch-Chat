@@ -20,6 +20,7 @@ let twitchSession = null;
 let live = false;
 let overlayActive = readObsMode(window.location.search);
 document.body.classList.toggle("obs-mode", overlayActive);
+document.documentElement.classList.toggle("obs-document", overlayActive);
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
