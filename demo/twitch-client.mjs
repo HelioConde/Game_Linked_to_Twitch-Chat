@@ -71,8 +71,9 @@ export class TwitchSession {
     if (!isReturn) return;
     // Remover token da URL imediatamente, antes de iniciar requisições ou carregar dados externos.
     window.history.replaceState(null, "", window.location.pathname);
-    let pending;
+    let pending = null;
     try { pending = JSON.parse(sessionStorage.getItem(OAUTH_PENDING_KEY) || "null"); }
+    catch { /* state corrompido: rejeita autorização */ }
     finally { sessionStorage.removeItem(OAUTH_PENDING_KEY); }
     try {
       const response = parseOAuthResult(hash, query);
@@ -136,8 +137,12 @@ export class TwitchSession {
   }
   async subscribe(sessionId) {
     const kinds = [CHAT_EVENT, ...(this.auth.withRewards ? [REWARD_EVENT] : [])];
+    let rewardWarning = "";
+    this.auth.rewardEnabled = false;
     for (const type of kinds) {
-      const response = await fetch(SUBSCRIBE_URL, {
+      let response;
+      try {
+        response = await fetch(SUBSCRIBE_URL, {
         method: "POST",
         headers: {
           "Client-Id": this.auth.clientId,
@@ -145,12 +150,16 @@ export class TwitchSession {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(subscriptionPayload(type, this.auth.userId, sessionId))
-      });
-      if (!response.ok) {
-        // Nunca ecoar o corpo completo da API ou credenciais no painel de chat.
-        throw new Error("Falha ao inscrever " + type + " (HTTP " + response.status + "). Verifique as permissões e o canal.");
+        });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        if (type === REWARD_EVENT) this.auth.rewardEnabled = true;
+      } catch (error) {
+        // Assinatura de pontos é opcional e não pode derrubar o chat principal.
+        if (type === REWARD_EVENT) rewardWarning = " Recompensas indisponíveis (" + error.message + ").";
+        else throw new Error("Falha ao inscrever chat (" + error.message + "). Verifique as permissões.");
       }
     }
+    return rewardWarning;
   }
   watchHeartbeat(seconds) {
     clearTimeout(this.heartbeatTimer);
@@ -187,7 +196,7 @@ export class TwitchSession {
     if (this.stopped || (socket !== this.socket && socket !== this.previousSocket)) return;
     let frame;
     try { frame = JSON.parse(raw); } catch { return; }
-    const event = interpretFrame(frame, this.auth.userId, this.auth.withRewards);
+    const event = interpretFrame(frame, this.auth.userId, this.auth.rewardEnabled);
     if (!event) return;
     if (socket === this.socket) this.watchHeartbeat(frame.payload?.session?.keepalive_timeout_seconds || 30);
     if (event.type === "welcome") {
@@ -202,11 +211,11 @@ export class TwitchSession {
         return;
       }
       try {
-        await this.subscribe(event.sessionId);
+        const warning = await this.subscribe(event.sessionId);
         if (this.stopped || socket !== this.socket) return;
         this.connected = true;
         this.reconnectCount = 0;
-        this.report("connected", "Lendo comandos no chat de " + this.auth.login + ".");
+        this.report("connected", "Lendo comandos no chat de " + this.auth.login + "." + warning);
       } catch (error) {
         this.disconnect("Não foi possível assinar os eventos: " + error.message, "error");
       }
