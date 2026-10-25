@@ -1,0 +1,30 @@
+name: Validar jogo e demo
+on:
+  push:
+    branches: [main, fix/legacy-security-stability-2026]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verificar sintaxe JavaScript
+        run: |
+          node --check js/script.js
+          node --check demo/engine.mjs
+          node --check demo/app.mjs
+      - name: Testar motor da arena
+        run: node --test tests/demo.test.mjs
+      - name: Confirmar arquivos necessarios
+        run: |
+          test -f demo/index.html
+          test -f demo/styles.css
+          test -f img/cena1.png
+          test -f img/charB1.png
+          test -f img/charB20.png
