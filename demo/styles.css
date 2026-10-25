@@ -167,3 +167,28 @@ form input:focus {border-color:var(--lime);box-shadow:0 0 0 2px #bdff7229;}
 @keyframes mirrorAttackSwoop {50% {transform:scaleX(-1) translateX(12px) scale(1.06);}}
 @media(max-width:550px) {.profile-content,.shop-list {padding-left:15px;padding-right:15px;} .shop-hint {padding-left:15px;padding-right:15px;} .roster-view {font-size:9px;padding:6px 8px;} }
 @media(prefers-reduced-motion:reduce) {.fighter-sprite.attacking,.fighter-sprite.attacking.mirror {animation:none;}}
+
+
+/* Etapa 4 — conexão Twitch opcional e autenticada */
+.twitch-content {padding:0 22px 23px;display:grid;gap:10px;}
+.twitch-content .panel-description {padding:0;margin:0;}
+.twitch-content>label {font-size:11px;font-weight:800;color:#cbd4e9;margin-top:10px;}
+.twitch-content>input {display:block;width:100%;min-width:0;border:1px solid #3d4863;background:#0e1426;color:#fff;padding:12px;border-radius:9px;font-size:12px;}
+.twitch-content>input:focus {border-color:var(--lime);outline-offset:3px;}
+.twitch-content .twitch-message {padding:10px 12px;margin:2px 0 0;border-radius:8px;background:#23334a;border:1px solid #46637c;font-size:11px;overflow-wrap:anywhere;}
+.twitch-channel {font-size:11px;color:var(--lime);margin:0;}
+.twitch-options {display:grid;gap:4px;background:#1c263b;border:1px solid #344561;padding:10px;border-radius:8px;}
+.twitch-checkbox {display:flex;align-items:start;gap:8px;font-size:11px;color:#e6eaf5;cursor:pointer;}
+.twitch-checkbox input {margin:3px 0 0;accent-color:var(--lime);flex-shrink:0;}
+.twitch-options small {color:#a7b2ce;font-size:10px;line-height:1.6;}
+.twitch-buttons {justify-content:flex-start;gap:8px;}
+.twitch-setup {color:#b3bdd2;font-size:11px;margin:5px 0 0;}
+.twitch-setup a {color:var(--lime);text-decoration:underline;}
+.twitch-redirect {display:block;overflow-wrap:anywhere;background:#090e1d;border:1px solid #343c59;border-radius:6px;padding:9px;color:#b9c8f2;font-size:10px;user-select:all;}
+.twitch-caution {font-size:10px;color:#929db8;line-height:1.7;margin:0;}
+#twitchStatus[data-status="connected"] {border-color:var(--lime);color:var(--lime);background:#1b3326;}
+#twitchStatus[data-status="reconnecting"],#twitchStatus[data-status="connecting"] {border-color:#d8bc76;color:#f7d88e;}
+#twitchStatus[data-status="error"] {border-color:#ff8196;color:#ff8196;}
+.live-mode-notice {margin:0 22px 14px;border:1px solid #497553;border-radius:7px;padding:10px;font-size:11px;background:#21362c;color:#c3edba;}
+.commands button:disabled {opacity:.45;cursor:not-allowed;}
+@media(max-width:550px) {.twitch-content{padding:0 15px 18px;} .live-mode-notice{margin:0 15px 12px;} .twitch-content>input{font-size:16px;}}
