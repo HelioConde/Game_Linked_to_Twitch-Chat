@@ -60,11 +60,11 @@ Acesse **[Chat Arena](./demo/index.html)** para experimentar a interface respons
 
 O botão **Adicionar aventureiros** cria exemplos para testar. A demo mantém seus dados na chave independente twitch-chat-arena-demo-v1 do armazenamento local do navegador. Se houver personagens antigos salvos na chave players, use **Importar personagens antigos**: a importação é opcional e preserva os dados de origem. O contador de duelos da demonstração é por sessão.
 
-**Atenção:** esta versão apenas simula mensagens do chat; ela não se conecta à Twitch e não oferece multiplayer online. Integração OAuth/EventSub e persistência no servidor ficam para etapas posteriores.
+**Atenção:** esta versão possui tanto comandos simulados quanto conexão opcional ao chat Twitch via OAuth/EventSub. Não oferece multiplayer com persistência compartilhada nem roda com a aba fechada.
 
 ### Testes do projeto
 
-O workflow [Validar jogo e demo](./.github/workflows/demo-ci.yml) verifica sintaxe JavaScript e executa testes com Node.js (comando: node --test tests/demo.test.mjs).
+O workflow [Validar jogo e demo](./.github/workflows/demo-ci.yml) verifica sintaxe JavaScript, executa os testes Node (node --test tests/*.test.mjs) e valida a interface com Playwright em Chromium.
 
 ### Etapa 3 — Progressão e combate RPG
 
@@ -134,10 +134,59 @@ Documentação oficial:
 [EventSub WebSockets](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/) e
 [chat](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage).
 
+
+### Etapa 5 — GitHub Pages e modo OBS
+
+A nova versão fica na pasta [demo/](./demo/index.html); o jogo clássico continua no
+[index.html](./index.html). O workflow [Publicar Chat Arena no GitHub Pages](./.github/workflows/pages.yml)
+executa os testes do motor, empacota apenas os arquivos públicos e tenta publicar em cada
+push para main. **É necessário habilitar Settings → Pages → Source: GitHub Actions** no
+repositório (caso ainda não esteja habilitado). A URL padrão do projeto, quando a
+publicação estiver concluída, será:
+
+- Jogo clássico: https://helioconde.github.io/Game_Linked_to_Twitch-Chat/
+- Nova arena: https://helioconde.github.io/Game_Linked_to_Twitch-Chat/demo/
+
+Não considere os endereços ativos antes de o workflow e as configurações do Pages
+confirmarem a publicação. Para OAuth Twitch, cadastre no console exatamente a URL
+HTTPS da arena com /demo/index.html no final — não a URL com parâmetros.
+
+#### Exibição no OBS
+
+**Opção A — Mesmo navegador autenticado, capturado no OBS (chat real):**
+abra a arena no navegador, conecte à Twitch e clique em **Ativar modo OBS nesta aba**.
+A interface esconde os painéis e ocupa a viewport inteira mostrando os personagens
+e batalhas sobre um fundo transparente. Pressione Esc para retornar sem recarregar
+a página, preservando a conexão OAuth em memória. Adicione a janela ao OBS por
+**Captura de janela**; se o navegador for capturado como uma janela opaca, recorte
+ou use um filtro apropriado no OBS para remover o fundo. Transparência nativa na
+captura da janela não é garantida.
+
+**Opção B — Browser Source, para prévia sem Twitch:**
+copie a URL da prévia fornecida no painel e adicione uma fonte **Navegador** no
+OBS Studio, com largura 1920, altura 1080 e fundo transparente. Essa página
+independente exibe 4 personagens de exemplo quando vazia; **não sincroniza**
+comandos com a aba principal e **não recebe** o access token OAuth de outra aba.
+Ela serve para ajustar layout e testar resolução do overlay no OBS.
+
+Para avaliar uma fonte Navegador com chat real, a autenticação precisaria ocorrer
+dentro do próprio contexto dessa fonte (e dependeria do suporte do navegador
+embutido ao login Twitch) ou haver um relay autenticado entre controller e OBS.
+Essas alternativas não estão implementadas nem validadas nesta etapa. Nunca
+adicione access tokens nas URLs do OBS.
+
+#### Qualidade
+
+O CI executa testes Node de regras e segurança e um job Playwright em Chromium
+que visita a arena em desktop e mobile, testa criação, PvP, transparência e
+os botões do modo OBS. As capturas ficam disponíveis como artefatos do workflow.
+Validação da Twitch com canal real ainda exige a configuração do Client ID e
+um teste manual de autorização/eventos.
+
 ### Etapas da retomada
 
 1. Auditoria e correções iniciais do legado.
 2. Interface moderna e demo offline (implementadas, pendente de QA visual).
 3. Combate e progressão avançados (implementados, pendentes de QA visual completo).
 4. Integração Twitch moderna (OAuth/EventSub implementados, verificação ao vivo pendente).
-5. Publicação, QA completo e modo OBS.
+5. Publicação e modo OBS implementados, pendentes de confirmação do Pages e validação ao vivo.
