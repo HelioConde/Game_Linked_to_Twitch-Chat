@@ -236,3 +236,76 @@ body.obs-mode .fighter-sprite {width:clamp(95px,14vw,220px);height:clamp(95px,14
 body.obs-mode .battle-log {background:#0e1431ce;border-radius:9px;padding:10px 20px;max-width:min(800px,90vw);min-height:36px;font-size:clamp(11px,1.3vw,19px);text-align:center;}
 @media(max-width:550px) {.obs-settings {padding:0 15px 18px;} body.obs-mode .obs-bar {max-width:94vw;gap:7px;padding:7px 10px;font-size:9px;} body.obs-mode .hero {width:50px;} body.obs-mode .sprite {width:55px;height:55px;} body.obs-mode .hero-name {font-size:8px;max-width:55px;} body.obs-mode .fighters {padding:10px;gap:10px;} body.obs-mode .fighter-sprite {width:80px;height:80px;} }
 @media(prefers-reduced-motion:reduce) {body.obs-mode .obs-exit {transition:none;}}
+
+
+/* 2026 character redesign — individual transparent 192x192 sprites. */
+.sprite, .fighter-sprite, .avatar-mini {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  image-rendering: auto;
+}
+.skin-gallery-panel {
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: linear-gradient(130deg, #202942, #171d30);
+  overflow: hidden;
+}
+.skin-gallery-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.skin-gallery-toggle::-webkit-details-marker {display:none;}
+.skin-gallery-title {display:grid;gap:4px;}
+.skin-gallery-title strong {font-size:14px;color:#f2f5ff;}
+.skin-gallery-title small {font-size:11px;color:#a9b5cc;}
+.skin-gallery-action {color:var(--lime);font-size:11px;font-weight:850;white-space:nowrap;}
+.skin-gallery-panel[open] .skin-gallery-action span {display:inline-block;transform:rotate(180deg);}
+.skin-gallery-body {padding:0 16px 16px;}
+.skin-gallery-help {font-size:11px;color:#c4cee0;margin:0 4px 12px;line-height:1.5;}
+.skin-gallery-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(115px, 125px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  gap: 10px;
+  padding: 6px 4px 13px;
+  scrollbar-color: #687d71 #1b2233;
+}
+.skin-card {
+  background: #111a2d;
+  border: 1px solid #3a4c65;
+  border-radius: 10px;
+  color: var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  padding:8px;
+  scroll-snap-align: start;
+  transition: border-color .15s,background .15s;
+  text-align:center;
+  min-width:0;
+}
+.skin-card img {width:100%;aspect-ratio:1;object-fit:contain;image-rendering:auto;}
+.skin-card-name {font-size:11px;font-weight:800;min-height:31px;display:grid;place-items:center;line-height:1.2;}
+.skin-card-number {font-size:10px;color:var(--lime);font-family:ui-monospace,monospace;}
+.skin-card:is(:hover,.is-selected) {border-color:var(--lime);background:#233346;}
+.skin-card:disabled {opacity:.5;cursor:not-allowed;}
+@media(max-width:550px) {
+  .skin-gallery-toggle {padding:12px 14px;align-items:flex-start;}
+  .skin-gallery-title strong {font-size:12px;}
+  .skin-gallery-action {font-size:10px;white-space:normal;text-align:right;}
+  .skin-gallery-grid {grid-auto-columns: minmax(105px, 115px);}
+  .skin-gallery-body {padding:0 10px 13px;}
+}
+body.obs-mode .skin-gallery-panel {display:none!important;}
+@media(prefers-reduced-motion:reduce) {.skin-card {transition:none;}}

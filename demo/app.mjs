@@ -2,6 +2,7 @@ import { MAX_PLAYERS, ITEMS, SKILLS, applyCommand, normalizeName, normalizePlaye
 import { TwitchSession } from "./twitch-client.mjs";
 import { rewardToCommand } from "./twitch-protocol.mjs";
 import { readObsMode, readPreviewMode, overlayPosition, viewUrl } from "./obs-mode.mjs";
+import { SKINS, getSkin } from "./skin-library.mjs";
 
 const STORAGE_KEY = "twitch-chat-arena-demo-v1";
 const $ = id => document.getElementById(id);
@@ -42,10 +43,49 @@ function persist() {
 function notify(message) { $("status").textContent = message; }
 
 function setSprite(node, skin) {
-  const number = Number(skin);
-  const safeSkin = Number.isInteger(number) && number >= 1 && number <= 20 ? number : 1;
-  node.style.backgroundImage = 'url("../img/charB' + safeSkin + '.png")';
+  const appearance = getSkin(skin);
+  node.style.backgroundImage = 'url("' + appearance.image + '")';
+  node.style.backgroundSize = "contain";
+  node.style.backgroundPosition = "center bottom";
+  node.style.backgroundRepeat = "no-repeat";
+  node.style.imageRendering = "auto";
 }
+
+
+
+function renderSkinGallery() {
+  const gallery = $("skinGallery");
+  gallery.replaceChildren();
+  for (const skin of SKINS) {
+    const button = element("button", "skin-card");
+    button.type = "button";
+    button.dataset.skin = String(skin.id);
+    button.setAttribute("aria-label", "Selecionar aparência " + skin.id + ": " + skin.name);
+    const image = document.createElement("img");
+    image.src = skin.image;
+    image.alt = "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.width = 124;
+    image.height = 124;
+    const label = element("span", "skin-card-name", skin.name);
+    const number = element("span", "skin-card-number", "#" + String(skin.id).padStart(2, "0"));
+    button.append(image, label, number);
+    button.addEventListener("click", () => {
+      const username = normalizeName($("username").value);
+      const exists = username && players.some(player => player.name === username);
+      $("command").value = (exists ? "!skin " : "!entrar ") + skin.id;
+      $("command").focus();
+      gallery.querySelectorAll(".skin-card").forEach(item => {
+        item.classList.toggle("is-selected", item === button);
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+      notify(skin.name + " selecionado. Envie o comando para aplicar a aparência.");
+    });
+    gallery.append(button);
+  }
+}
+renderSkinGallery();
 
 function avatar(player) {
   const node = element("div", "avatar-mini");
@@ -69,7 +109,7 @@ function renderArena() {
     hero.append(element("span", "hero-level", "NV " + player.level));
     const sprite = element("div", "sprite");
     sprite.setAttribute("role", "img");
-    sprite.setAttribute("aria-label", "Aparencia " + player.skin + " de " + player.name);
+    sprite.setAttribute("aria-label", getSkin(player.skin).name + " de " + player.name);
     setSprite(sprite, player.skin);
     hero.append(sprite);
     nodes.actors.append(hero);
@@ -117,7 +157,7 @@ function renderProfile() {
   if (!selected) { selectedName = null; return; }
   selectedName = selected.name;
   $("detailName").textContent = selected.name;
-  $("detailLevel").textContent = "Nível " + selected.level + " • " + selected.wins + " V / " + selected.losses + " D";
+  $("detailLevel").textContent = getSkin(selected.skin).name + " • Nível " + selected.level + " • " + selected.wins + " V / " + selected.losses + " D";
   $("detailStats").textContent = "Ataque " + selected.attack + " • Defesa " + selected.defense +
     " • Vida " + selected.health + " • Velocidade " + selected.speed;
   $("detailXp").textContent = selected.xp + " / " + xpToNext(selected.level) + " XP";

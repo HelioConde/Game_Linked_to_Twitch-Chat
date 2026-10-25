@@ -90,3 +90,35 @@ test("combate PvP termina e atualiza o ranking", async () => {
     assert.deepEqual(errors, []);
   } finally { await context.close(); }
 });
+
+
+test("nova galeria — 20 personagens, seleção da skin e imagem carregada", async () => {
+  const { context, page, errors } = await open({ width: 1366, height: 768 });
+  try {
+    await page.locator("#skinsSection summary").click();
+    assert.equal(await page.locator(".skin-card").count(), 20);
+    const images = await page.locator(".skin-card img").evaluateAll(nodes =>
+      nodes.map(image => ({ src: image.getAttribute("src"), width: image.naturalWidth, loaded: image.complete }))
+    );
+    // Imagens com loading=lazy são requisitadas conforme a galeria é percorrida.
+    assert.equal(images.length, 20);
+    for (const index of [1, 5, 10, 15, 20]) {
+      const card = page.locator('.skin-card[data-skin="' + index + '"]');
+      await card.scrollIntoViewIfNeeded();
+      const image = card.locator("img");
+      await image.evaluate(img => img.decode());
+      assert.ok(await image.evaluate(img => img.naturalWidth > 0), "Skin " + index + " não carregou");
+    }
+    await page.locator('#skinGallery .skin-card[data-skin="20"]').click();
+    assert.equal(await page.locator("#command").inputValue(), "!entrar 20");
+    await page.locator("#sendChat").click();
+    assert.equal((await page.locator("#stat-players").textContent()).trim(), "1");
+    const background = await page.locator(".hero .sprite").evaluate(el => getComputedStyle(el).backgroundImage);
+    assert.match(background, /skin-20-valkyrie\.webp/);
+    const preview = await page.request.get(new URL("../img/characters-v2/skin-20-valkyrie.webp", base).href);
+    assert.equal(preview.status(), 200);
+    assert.match(preview.headers()["content-type"] || "", /image\/webp/);
+    await page.screenshot({ path: screenshotDir + "/new-character-gallery.png", fullPage: true });
+    assert.deepEqual(errors, []);
+  } finally { await context.close(); }
+});

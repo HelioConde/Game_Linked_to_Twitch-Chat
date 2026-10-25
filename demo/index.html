@@ -28,15 +28,26 @@
   <main id="main" class="shell">
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 5.0</p>
+        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 5.1</p>
         <h1 id="page-title">Seu chat. <span>Uma arena.</span><br>Infinitas histórias.</h1>
         <p class="subtitle">Ganhe experiência em treinos e duelos, compre equipamentos, escolha habilidades e dispute o ranking antes de integrar a Twitch.</p>
       </div>
       <div class="intro-note">
         <span class="note-icon" aria-hidden="true">⌘</span>
-        <div><strong>Modo laboratório</strong><p>As mensagens são simuladas neste navegador. Nenhuma conexão com a Twitch é realizada.</p></div>
+        <div><strong>Modo laboratório</strong><p>Teste em modo offline ou conecte sua conta Twitch pelo painel de autenticação.</p></div>
       </div>
     </section>
+
+    <details class="skin-gallery-panel" id="skinsSection">
+      <summary class="skin-gallery-toggle">
+        <span class="skin-gallery-title"><strong>20 novas aparências de aventureiros</strong><small>Escolha um personagem para preencher o comando do chat.</small></span>
+        <span class="skin-gallery-action">Explorar personagens <span aria-hidden="true">▾</span></span>
+      </summary>
+      <div class="skin-gallery-body">
+        <p class="skin-gallery-help">Clique em um personagem. Use <code>!entrar N</code> para criá-lo ou <code>!skin N</code> para trocar a aparência de um jogador existente.</p>
+        <div class="skin-gallery-grid" id="skinGallery" aria-label="Galeria de vinte personagens"></div>
+      </div>
+    </details>
 
     <section class="stats" aria-label="Resumo do jogo">
       <div class="stat-card"><span>Aventureiros</span><strong id="stat-players">0</strong><small>Personagens criados</small></div>
