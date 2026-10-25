@@ -1,4 +1,4 @@
-import { MAX_PLAYERS, applyCommand, awardWin, normalizeName, normalizePlayers, runDuel } from "./engine.mjs";
+import { MAX_PLAYERS, ITEMS, SKILLS, applyCommand, normalizeName, normalizePlayers, runDuel, settleDuel, xpToNext } from "./engine.mjs";
 
 const STORAGE_KEY = "twitch-chat-arena-demo-v1";
 const $ = id => document.getElementById(id);
@@ -10,6 +10,7 @@ const nodes = {
 let players = readSaved();
 let duelCount = 0;
 let fighting = false;
+let selectedName = players[0]?.name ?? null;
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -87,9 +88,43 @@ function renderRoster() {
     row.append(avatar(player));
     const text = element("div");
     text.append(element("strong", "", player.name));
-    text.append(element("small", "", "NV " + player.level + "  •  ATQ " + player.attack + "  •  DEF " + player.defense));
-    row.append(text);
+    text.append(element("small", "", "NV " + player.level + "  •  " + player.xp + "/" + xpToNext(player.level) + " XP  •  " + player.gold + " moedas"));
+    const view = element("button", "roster-view", "Ver perfil");
+    view.type = "button";
+    view.setAttribute("aria-label", "Ver perfil de " + player.name);
+    view.addEventListener("click", () => { selectedName = player.name; renderProfile(); });
+    row.append(text, view);
     nodes.roster.append(row);
+  });
+}
+
+function renderProfile() {
+  const selected = players.find(player => player.name === selectedName) ?? players[0];
+  $("profileEmpty").hidden = Boolean(selected);
+  $("profileContent").hidden = !selected;
+  if (!selected) { selectedName = null; return; }
+  selectedName = selected.name;
+  $("detailName").textContent = selected.name;
+  $("detailLevel").textContent = "Nível " + selected.level + " • " + selected.wins + " V / " + selected.losses + " D";
+  $("detailStats").textContent = "Ataque " + selected.attack + " • Defesa " + selected.defense +
+    " • Vida " + selected.health + " • Velocidade " + selected.speed;
+  $("detailXp").textContent = selected.xp + " / " + xpToNext(selected.level) + " XP";
+  $("detailXpBar").style.width = Math.min(100, selected.xp / xpToNext(selected.level) * 100) + "%";
+  $("detailGold").textContent = selected.gold + " moedas";
+  $("detailSkill").textContent = "Habilidade: " + selected.skill + " — " + SKILLS[selected.skill];
+  $("detailGear").textContent = "Equipado: " + ITEMS[selected.equipment.weapon].name +
+    " / " + ITEMS[selected.equipment.armor].name;
+  $("detailInventory").replaceChildren();
+  for (const id of selected.inventory) {
+    const item = ITEMS[id];
+    const chip = element("span", "inventory-chip", item.name);
+    if (Object.values(selected.equipment).includes(id)) chip.classList.add("equipped");
+    $("detailInventory").append(chip);
+  }
+  document.querySelectorAll(".roster-view").forEach(button => {
+    const row = button.closest(".roster-item");
+    const active = row?.querySelector("strong")?.textContent === selectedName;
+    button.setAttribute("aria-pressed", String(active));
   });
 }
 
@@ -100,6 +135,7 @@ function render() {
   renderArena();
   renderLeaderboard();
   renderRoster();
+  renderProfile();
 }
 
 function logMessage(author, content, type = "user") {
@@ -147,20 +183,28 @@ async function animateDuel(challenger, opponent) {
       const sourcePrefix = turn.attacker === left.name ? "fighterLeft" : "fighterRight";
       $(targetPrefix + "Bar").style.width = Math.max(0, turn.health / result.initialHealth[turn.target] * 100) + "%";
       $(targetPrefix + "Hp").textContent = turn.health + " PV";
-      $(targetPrefix + "Sprite").classList.toggle("hit", !turn.missed);
-      $(sourcePrefix + "Sprite").classList.remove("hit");
+      $(sourcePrefix + "Bar").style.width = Math.max(0, turn.attackerHealth / result.initialHealth[turn.attacker] * 100) + "%";
+      $(sourcePrefix + "Hp").textContent = turn.attackerHealth + " PV";
+      const targetSprite = $(targetPrefix + "Sprite");
+      const sourceSprite = $(sourcePrefix + "Sprite");
+      targetSprite.classList.toggle("hit", !turn.missed);
+      sourceSprite.classList.toggle("attacking", true);
+      sourceSprite.classList.toggle("casting", Boolean(turn.skill));
       $("battleLog").textContent = turn.missed
         ? turn.attacker + " errou o ataque!"
-        : turn.attacker + " causou " + turn.damage + " de dano em " + turn.target + ".";
-      await pause(300);
-      $(targetPrefix + "Sprite").classList.remove("hit");
+        : turn.attacker + (turn.skill ? " usou " + turn.skill + " e" : "") +
+          " causou " + turn.damage + " de dano" + (turn.critical ? " CRÍTICO" : "") +
+          (turn.healing ? " • recuperou " + turn.healing + " PV" : "") + "!";
+      await pause(Math.max(95, 320 - result.turns.length * 2));
+      targetSprite.classList.remove("hit");
+      sourceSprite.classList.remove("attacking", "casting");
     }
     $("battleLog").textContent = "🏆 " + result.winner + " venceu o duelo!";
-    players = awardWin(players, result.winner);
+    players = settleDuel(players, result);
     duelCount += 1;
     persist();
     render();
-    logMessage("ARENA", result.winner + " venceu " + result.loser + "!", "system");
+    logMessage("ARENA", result.winner + " venceu " + result.loser + " (+45 XP, +28 moedas)! " + result.loser + " recebeu 20 XP e 12 moedas.", "system");
     await pause(1100);
   } finally {
     nodes.duel.hidden = true;
@@ -225,6 +269,7 @@ $("seedDemo").addEventListener("click", () => {
 $("resetDemo").addEventListener("click", () => {
   if (fighting || !window.confirm("Apagar os personagens do modo demonstracao? O jogo classico nao sera afetado.")) return;
   players = [];
+  selectedName = null;
   duelCount = 0;
   persist();
   render();
@@ -246,7 +291,7 @@ $("importLegacy").addEventListener("click", () => {
   if (fighting) return;
   const existing = new Set(players.map(player => player.name));
   const newPlayers = findLegacy().filter(player => !existing.has(player.name));
-  const space = MAX_PLAYERS - players.length;
+  const space = Math.max(0, MAX_PLAYERS - players.length);
   players = [...players, ...newPlayers.slice(0, space)];
   persist();
   render();
