@@ -29,7 +29,11 @@ test("botões de comando e perfil utilizam seletores registrados", () => {
 });
 
 test("a demo mantém o modo offline e o jogo clássico separado", () => {
-  assert.match(html, /DEMO OFFLINE/);
+  assert.match(html, /DEMO \+ EVENTSUB/);
+  assert.match(html, /id="twitchConnect"/);
+  assert.match(html, /id="twitchDisconnect"/);
+  assert.match(html, /id="twitchClientId"/);
+  assert.match(html, /id="twitchStatus"/);
   assert.match(html, /Jogo clássico/);
   assert.match(app, /twitch-chat-arena-demo-v1/);
   assert.ok(!app.includes("ComfyJS.Init"));

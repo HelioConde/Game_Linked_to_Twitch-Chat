@@ -19,6 +19,8 @@ jobs:
           node --check js/script.js
           node --check demo/engine.mjs
           node --check demo/app.mjs
+          node --check demo/twitch-protocol.mjs
+          node --check demo/twitch-client.mjs
       - name: Testar motor da arena
         run: node --test tests/*.test.mjs
       - name: Confirmar arquivos necessarios
@@ -28,3 +30,5 @@ jobs:
           test -f img/cena1.png
           test -f img/charB1.png
           test -f img/charB20.png
+          test -f demo/twitch-client.mjs
+          test -f demo/twitch-protocol.mjs

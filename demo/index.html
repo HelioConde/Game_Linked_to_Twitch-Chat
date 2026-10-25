@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c1020">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' https://id.twitch.tv https://api.twitch.tv wss://eventsub.wss.twitch.tv; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="description" content="Demonstração offline do Game Linked to Twitch Chat: crie personagens, treine e faça duelos por comandos de chat.">
   <title>Chat Arena • Game Linked to Twitch Chat</title>
   <link rel="stylesheet" href="./styles.css">
@@ -17,7 +19,7 @@
       <span><strong>CHAT<span class="brand-accent">ARENA</span></strong><small>TWITCH RPG LAB</small></span>
     </a>
     <div class="header-actions">
-      <span class="offline-pill"><span class="status-dot"></span> DEMO OFFLINE</span>
+      <span class="offline-pill"><span class="status-dot"></span> DEMO + EVENTSUB</span>
       <a class="link-button" href="../index.html">Jogo clássico ↗</a>
     </div>
   </header>
@@ -25,7 +27,7 @@
   <main id="main" class="shell">
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 3.0</p>
+        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 4.0</p>
         <h1 id="page-title">Seu chat. <span>Uma arena.</span><br>Infinitas histórias.</h1>
         <p class="subtitle">Ganhe experiência em treinos e duelos, compre equipamentos, escolha habilidades e dispute o ranking antes de integrar a Twitch.</p>
       </div>
@@ -94,12 +96,37 @@
       </section>
 
       <aside class="side-column">
+        <section class="panel twitch-panel" aria-labelledby="twitch-heading">
+          <div class="panel-heading">
+            <div><p class="eyebrow">03 / TWITCH EVENTSUB</p><h2 id="twitch-heading">Conectar chat real</h2></div>
+            <span class="test-badge" id="twitchStatus" data-status="offline">OFFLINE</span>
+          </div>
+          <div class="twitch-content">
+            <p class="panel-description">Autorize sua conta Twitch para receber comandos dos espectadores em tempo real. O modo demo permanece disponível sem conexão.</p>
+            <p class="twitch-message" id="twitchStatusMessage" role="status">Modo demonstração disponível.</p>
+            <p class="twitch-channel" id="twitchChannel">Conecte a conta proprietária do canal.</p>
+            <label for="twitchClientId">Client ID público do aplicativo Twitch</label>
+            <input type="text" id="twitchClientId" maxlength="64" minlength="20" autocomplete="off" spellcheck="false" placeholder="Client ID (nunca Client Secret)">
+            <div class="twitch-options">
+              <label class="twitch-checkbox" for="twitchRewards"><input type="checkbox" id="twitchRewards"> Ler também recompensas de pontos do canal</label>
+              <small>Opcional. Usa a permissão adicional <code>channel:read:redemptions</code> e IDs do jogo clássico.</small>
+            </div>
+            <div class="button-group twitch-buttons">
+              <button type="button" class="button button-primary" id="twitchConnect">Conectar Twitch</button>
+              <button type="button" class="button button-secondary" id="twitchDisconnect" hidden>Desconectar</button>
+            </div>
+            <p class="twitch-setup">No <a href="https://dev.twitch.tv/console/apps" target="_blank" rel="noopener noreferrer">Twitch Developer Console</a>, registre um aplicativo e cadastre exatamente esta URL de redirecionamento:</p>
+            <code class="twitch-redirect" id="twitchRedirect"></code>
+            <p class="twitch-caution">Não cole Client Secret nem token de acesso. O token OAuth recebido fica somente em memória durante esta aba; ao recarregar, será preciso reconectar. Você autoriza o chat da própria conta Twitch conectada.</p>
+          </div>
+        </section>
         <section class="panel simulator-panel" aria-labelledby="sim-title">
           <div class="panel-heading">
-            <div><p class="eyebrow">03 / PAINEL DE TESTE</p><h2 id="sim-title">Simulador de chat</h2></div>
+            <div><p class="eyebrow">04 / PAINEL DE TESTE</p><h2 id="sim-title">Simulador de chat</h2></div>
             <span class="test-badge">● TEST MODE</span>
           </div>
           <p class="panel-description">Envie comandos como se fosse um espectador assistindo à transmissão.</p>
+          <p id="liveModeNotice" class="live-mode-notice" hidden>Conectado ao chat real. Desconecte a Twitch para voltar a usar os comandos simulados.</p>
           <form id="chatForm" novalidate>
             <label for="username">Usuário da Twitch (simulado)</label>
             <input id="username" name="username" maxlength="25" pattern="[a-zA-Z0-9_]+" placeholder="ex.: alchemy_flames" autocomplete="off" required value="alchemy_flames">
@@ -132,7 +159,7 @@
         </section>
         <section class="panel roster-panel">
           <div class="panel-heading">
-            <div><p class="eyebrow">04 / ELENCO</p><h2>Personagens</h2></div>
+            <div><p class="eyebrow">05 / ELENCO</p><h2>Personagens</h2></div>
             <span id="rosterCount" class="tiny-label">0 registrados</span>
           </div>
           <div id="roster" class="roster"></div>
@@ -140,7 +167,7 @@
         </section>
         <section class="panel profile-panel" aria-labelledby="profile-heading">
           <div class="panel-heading">
-            <div><p class="eyebrow">05 / HERÓI</p><h2 id="profile-heading">Ficha do aventureiro</h2></div>
+            <div><p class="eyebrow">06 / HERÓI</p><h2 id="profile-heading">Ficha do aventureiro</h2></div>
             <span class="tiny-label">Selecione “Ver perfil” na lista</span>
           </div>
           <p id="profileEmpty" class="empty-copy">Entre na arena para consultar sua ficha.</p>
@@ -159,7 +186,7 @@
         </section>
         <section class="panel shop-panel" aria-labelledby="shop-heading">
           <div class="panel-heading">
-            <div><p class="eyebrow">06 / EQUIPAMENTOS</p><h2 id="shop-heading">Loja da arena</h2></div>
+            <div><p class="eyebrow">07 / EQUIPAMENTOS</p><h2 id="shop-heading">Loja da arena</h2></div>
             <span class="tiny-label">Moedas obtidas em duelos</span>
           </div>
           <div class="shop-list">
@@ -172,7 +199,7 @@
         </section>
       </aside>
     </div>
-    <footer class="footer">GAME LINKED TO TWITCH CHAT · DEMO LOCAL <span>Desenvolvido a partir do projeto original • Sem autenticação ou chat Twitch real</span></footer>
+    <footer class="footer">GAME LINKED TO TWITCH CHAT · DEMO LOCAL <span>Desenvolvido a partir do projeto original • Twitch real opcional via OAuth/EventSub</span></footer>
   </main>
 </body>
 </html>
