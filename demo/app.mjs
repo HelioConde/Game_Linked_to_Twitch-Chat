@@ -1,6 +1,7 @@
 import { MAX_PLAYERS, ITEMS, SKILLS, applyCommand, normalizeName, normalizePlayers, runDuel, settleDuel, xpToNext } from "./engine.mjs";
 import { TwitchSession } from "./twitch-client.mjs";
 import { rewardToCommand } from "./twitch-protocol.mjs";
+import { readObsMode, readPreviewMode, overlayPosition, viewUrl } from "./obs-mode.mjs";
 
 const STORAGE_KEY = "twitch-chat-arena-demo-v1";
 const $ = id => document.getElementById(id);
@@ -17,6 +18,8 @@ const liveQueue = [];
 const userCooldown = new Map();
 let twitchSession = null;
 let live = false;
+let overlayActive = readObsMode(window.location.search);
+document.body.classList.toggle("obs-mode", overlayActive);
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -56,8 +59,10 @@ function renderArena() {
   $("sceneCount").textContent = players.length + " / " + MAX_PLAYERS + " jogadores" + (players.length > 12 ? " • 12 exibidos" : "");
   players.slice(0, 12).forEach((player, index) => {
     const hero = element("div", "hero");
-    hero.style.left = 10 + (index % 6) * 16 + "%";
-    hero.style.bottom = (index < 6 ? 11 : 48) + "%";
+    const placement = overlayActive ? overlayPosition(index, Math.min(12, players.length)) :
+      { left: 10 + (index % 6) * 16 + "%", bottom: (index < 6 ? 11 : 48) + "%" };
+    hero.style.left = placement.left;
+    hero.style.bottom = placement.bottom;
     hero.style.zIndex = index < 6 ? "3" : "2";
     hero.append(element("span", "hero-name", player.name));
     hero.append(element("span", "hero-level", "NV " + player.level));
@@ -136,6 +141,7 @@ function renderProfile() {
 
 function render() {
   $("stat-players").textContent = String(players.length);
+  $("obsPlayerCount").textContent = players.length + " aventureiros";
   $("stat-duels").textContent = String(duelCount);
   $("stat-level").textContent = String(Math.max(0, ...players.map(player => player.level)));
   renderArena();
@@ -331,6 +337,8 @@ logMessage("ARENA", "Demo offline iniciada. Use !entrar 1 ou Adicionar aventurei
 // Twitch é opt-in: o modo offline segue jogável sem autenticação.
 function updateTwitchStatus({ status, message, channel }) {
   live = status === "connected";
+  $("obsConnection").textContent = status === "connected" ? "TWITCH AO VIVO" :
+    status === "connecting" ? "CONECTANDO" : "DEMONSTRAÇÃO";
   $("twitchStatus").textContent = status === "connected" ? "AO VIVO"
     : status === "connecting" || status === "authenticating" ? "CONECTANDO"
     : status === "reconnecting" ? "RECONECTANDO" : status === "error" ? "ERRO" : "OFFLINE";
@@ -377,3 +385,45 @@ $("twitchDisconnect").addEventListener("click", () => {
 void twitchSession.restoreRedirect().catch(error => {
   twitchSession.disconnect("Falha ao recuperar autorização Twitch: " + error.message, "error");
 });
+
+
+// A janela que recebeu o OAuth pode ser capturada pelo OBS em modo transparente.
+// Não copiamos access tokens para outra aba, URL, localStorage ou BroadcastChannel.
+function toggleObsMode(force = !overlayActive) {
+  overlayActive = Boolean(force);
+  document.body.classList.toggle("obs-mode", overlayActive);
+  document.documentElement.classList.toggle("obs-document", overlayActive);
+  const target = viewUrl(window.location.href, overlayActive);
+  window.history.replaceState(null, "", target.pathname + target.search);
+  $("obsExit").hidden = !overlayActive;
+  $("obsEnter").setAttribute("aria-pressed", String(overlayActive));
+  renderArena();
+  notify(overlayActive ? "Modo OBS ativado. Pressione Escape para retornar ao painel." : "Painel restaurado.");
+}
+$("obsEnter").addEventListener("click", () => toggleObsMode(true));
+$("obsExit").addEventListener("click", () => toggleObsMode(false));
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && overlayActive) toggleObsMode(false);
+});
+$("obsCopy").addEventListener("click", async () => {
+  const preview = viewUrl(window.location.href, true, true).href;
+  try {
+    await navigator.clipboard.writeText(preview);
+    notify("Endereço da prévia OBS copiado.");
+  } catch {
+    $("obsPreviewUrl").textContent = preview;
+    notify("Copie o endereço exibido no painel OBS.");
+  }
+});
+$("obsPreviewUrl").textContent = viewUrl(window.location.href, true, true).href;
+$("obsExit").hidden = !overlayActive;
+$("obsEnter").setAttribute("aria-pressed", String(overlayActive));
+
+// Prévia isolada, para OBS Browser Source sem autenticação ou sincronização falsa.
+// A versão real funciona na MESMA aba autenticada, usando captura de janela.
+if (readPreviewMode(window.location.search) && !players.length) {
+  for (const [name, skin] of [["alchemy_flames", 1], ["luci", 5], ["pixel_witch", 9], ["slime_keeper", 15]]) {
+    players = applyCommand(players, name, "!entrar " + skin).players;
+  }
+  render();
+}
