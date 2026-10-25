@@ -142,6 +142,30 @@ Documentação oficial:
 [chat](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage).
 
 
+
+## Interface focada — Chat Arena 5.2
+
+A experiência principal foi reorganizada para **caber em uma tela no desktop**
+e evitar painéis longos de informações. Ao abrir a demo, o jogador vê a arena
+ampliada e apenas três abas de controle:
+
+- **Jogar:** comandos manuais, botões de ação rápida Entrar, Treinar e Duelo,
+  e uma lista curta dos últimos acontecimentos. O botão **Mais comandos**
+  revela ações avançadas apenas quando necessário.
+- **Heróis:** galeria de 20 personagens, elenco, fichas, ranking e loja;
+  todas as informações permanecem disponíveis sem disputar espaço com a arena.
+- **Twitch / OBS:** autenticação, recompensas e configurações para transmissão.
+
+A janela do chat não repete cada mensagem de comando. Agora registra o
+resultado da ação, consolida acontecimentos repetidos em um contador e mantém
+um histórico visual de no máximo sete acontecimentos. Comandos informativos
+como !perfil, !inventario, !loja e !ajuda levam diretamente para a área útil.
+
+A arena permanece visível ao trocar de aba. No desktop a página não precisa
+rolar: os painéis secundários rolam internamente. Em celulares, o layout
+organiza arena e controles em blocos verticais responsivos. O modo OBS
+transparente e a integração Twitch permanecem disponíveis e separados.
+
 ## Novos personagens — 20 skins de 2026
 
 As 20 novas artes de fantasia foram adicionadas em [img/characters-v2](./img/characters-v2/)

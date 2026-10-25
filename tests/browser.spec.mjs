@@ -27,7 +27,16 @@ test("desktop — renderiza heróis e muda para overlay transparente sem navegar
     await page.locator("#seedDemo").click();
     assert.equal((await page.locator("#stat-players").textContent()).trim(), "4");
     assert.equal(await page.locator(".hero").count(), 4);
+    const oneScreen = await page.evaluate(() => ({
+      pageHeight: document.documentElement.scrollHeight,
+      viewportHeight: innerHeight,
+      stageHeight: document.querySelector("#arena").getBoundingClientRect().height
+    }));
+    assert.ok(oneScreen.pageHeight <= oneScreen.viewportHeight + 3,
+      "Desktop must fit one screen: " + JSON.stringify(oneScreen));
+    assert.ok(oneScreen.stageHeight >= 300, "Arena should be visually prominent");
     await page.screenshot({ path: screenshotDir + "/desktop.png" });
+    await page.locator("#tab-connect").click();
     await page.locator("#obsEnter").click();
     assert.equal(await page.locator("body").evaluate(el => el.classList.contains("obs-mode")), true);
     assert.equal(new URL(page.url()).searchParams.get("obs"), "1");
@@ -95,6 +104,7 @@ test("combate PvP termina e atualiza o ranking", async () => {
 test("nova galeria — 20 personagens, seleção da skin e imagem carregada", async () => {
   const { context, page, errors } = await open({ width: 1366, height: 768 });
   try {
+    await page.locator("#tab-heroes").click();
     await page.locator("#skinsSection summary").click();
     assert.equal(await page.locator(".skin-card").count(), 20);
     const images = await page.locator(".skin-card img").evaluateAll(nodes =>
@@ -119,6 +129,49 @@ test("nova galeria — 20 personagens, seleção da skin e imagem carregada", as
     assert.equal(preview.status(), 200);
     assert.match(preview.headers()["content-type"] || "", /image\/webp/);
     await page.screenshot({ path: screenshotDir + "/new-character-gallery.png", fullPage: true });
+    assert.deepEqual(errors, []);
+  } finally { await context.close(); }
+});
+
+
+test("navegação focada — três áreas e ações rápidas com feedback curto", async () => {
+  const { context, page, errors } = await open({width: 1440, height: 900});
+  try {
+    assert.equal(await page.locator(".workspace-tab").count(), 3);
+    assert.equal(await page.locator("#panel-play").isVisible(), true);
+    assert.equal(await page.locator("#panel-connect").isVisible(), false);
+    await page.locator("#tab-heroes").click();
+    assert.equal(await page.locator("#panel-play").isVisible(), false);
+    assert.equal(await page.locator("#panel-heroes").isVisible(), true);
+    await page.locator("#tab-connect").click();
+    assert.equal(await page.locator("#twitchClientId").isVisible(), true);
+    await page.locator("#tab-play").click();
+    await page.locator('[data-quick="join"]').click();
+    assert.equal((await page.locator("#stat-players").textContent()).trim(), "1");
+    await page.locator('[data-quick="train"]').click();
+    assert.equal((await page.locator("#chatFeed .chat-line").count()), 2);
+    assert.equal(await page.locator('#chatFeed').textContent().then(text => text.includes("!treinar")), false);
+    await page.locator("#command").fill("!ajuda");
+    await page.locator("#sendChat").click();
+    assert.equal(await page.locator("#advancedCommands").evaluate(node => node.open), true);
+    assert.ok(await page.locator("#chatFeed .chat-line").count() <= 7);
+    assert.deepEqual(errors, []);
+  } finally { await context.close(); }
+});
+
+test("atividade — repetição consolidada, sem duplicar comandos", async () => {
+  const { context, page, errors } = await open({width: 1366, height: 768});
+  try {
+    await page.locator('[data-quick="join"]').click();
+    for (let i=0;i<5;i++) await page.locator('[data-quick="train"]').click();
+    const events = page.locator("#chatFeed .chat-line");
+    assert.ok(await events.count() <= 4, "Treinos repetidos não devem lotar o painel");
+    assert.ok((await page.locator("#chatFeed").textContent()).match(/×[2-9]/));
+    assert.ok(!(await page.locator("#chatFeed").textContent()).includes("!treinar"));
+    const vertical = await page.evaluate(() => ({
+      document: document.documentElement.scrollHeight, viewport: innerHeight
+    }));
+    assert.ok(vertical.document <= vertical.viewport + 3, "A página não deve rolar no desktop");
     assert.deepEqual(errors, []);
   } finally { await context.close(); }
 });

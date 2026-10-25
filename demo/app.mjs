@@ -40,7 +40,39 @@ function persist() {
   catch (error) { notify("O navegador nao permitiu salvar os personagens."); }
 }
 
-function notify(message) { $("status").textContent = message; }
+function notify(message) {
+  $("status").textContent = message;
+  $("activityHighlight").textContent = message;
+}
+
+const WORKSPACES = ["play", "heroes", "connect"];
+let activeWorkspace = "play";
+function selectWorkspace(workspace, focus = false) {
+  if (!WORKSPACES.includes(workspace)) return;
+  activeWorkspace = workspace;
+  for (const name of WORKSPACES) {
+    const chosen = name === workspace;
+    const tab = $("tab-" + name);
+    const panel = $("panel-" + name);
+    tab.setAttribute("aria-selected", String(chosen));
+    tab.tabIndex = chosen ? 0 : -1;
+    panel.hidden = !chosen;
+    if (chosen && focus) tab.focus();
+  }
+}
+document.querySelectorAll(".workspace-tab").forEach(tab => {
+  tab.addEventListener("click", () => selectWorkspace(tab.dataset.workspace));
+  tab.addEventListener("keydown", event => {
+    const index = WORKSPACES.indexOf(tab.dataset.workspace);
+    const next = event.key === "ArrowRight" ? index + 1
+      : event.key === "ArrowLeft" ? index - 1 : event.key === "Home" ? 0
+      : event.key === "End" ? WORKSPACES.length - 1 : -1;
+    if (next === -1) return;
+    event.preventDefault();
+    selectWorkspace(WORKSPACES[(next + WORKSPACES.length) % WORKSPACES.length], true);
+  });
+});
+
 
 function setSprite(node, skin) {
   const appearance = getSkin(skin);
@@ -80,7 +112,8 @@ function renderSkinGallery() {
         item.classList.toggle("is-selected", item === button);
         item.setAttribute("aria-pressed", String(item === button));
       });
-      notify(skin.name + " selecionado. Envie o comando para aplicar a aparência.");
+      selectWorkspace("play");
+      notify(skin.name + " selecionado. Clique em Enviar para confirmar.");
     });
     gallery.append(button);
   }
@@ -102,6 +135,12 @@ function renderArena() {
     const hero = element("div", "hero");
     const placement = overlayActive ? overlayPosition(index, Math.min(12, players.length)) :
       { left: 10 + (index % 6) * 16 + "%", bottom: (index < 6 ? 11 : 48) + "%" };
+    if (!overlayActive) {
+      const rowSize = Math.min(6, players.length);
+      const currentRowCount = index < 6 ? rowSize : Math.min(6, players.length - 6);
+      const inRow = index < 6 ? index : index - 6;
+      placement.left = (12 + (inRow + 0.5) * 76 / currentRowCount) + "%";
+    }
     hero.style.left = placement.left;
     hero.style.bottom = placement.bottom;
     hero.style.zIndex = index < 6 ? "3" : "2";
@@ -144,7 +183,7 @@ function renderRoster() {
     const view = element("button", "roster-view", "Ver perfil");
     view.type = "button";
     view.setAttribute("aria-label", "Ver perfil de " + player.name);
-    view.addEventListener("click", () => { selectedName = player.name; renderProfile(); });
+    view.addEventListener("click", () => { selectedName = player.name; selectWorkspace("heroes"); renderProfile(); });
     row.append(text, view);
     nodes.roster.append(row);
   });
@@ -191,14 +230,29 @@ function render() {
   renderProfile();
 }
 
-function logMessage(author, content, type = "user") {
+// Um acontecimento por ação, com consolidação de repetição e histórico curto.
+function logMessage(author, content, type = "system") {
   const placeholder = nodes.chat.querySelector(".chat-placeholder");
   if (placeholder) placeholder.remove();
-  const line = element("div", "chat-line" + (type === "user" ? "" : " " + type));
-  const timestamp = element("span", "timestamp", new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }));
-  line.append(timestamp, element("b", "", author), document.createTextNode("  " + content));
-  nodes.chat.append(line);
-  while (nodes.chat.children.length > 50) nodes.chat.firstElementChild.remove();
+  const key = author + "|" + type + "|" + content;
+  const previous = [...nodes.chat.querySelectorAll(".chat-line")].find(item =>
+    item.dataset.eventKey === key && Date.now() - Number(item.dataset.updatedAt) < 60000);
+  if (previous) {
+    const repeats = Number(previous.dataset.repeats || "1") + 1;
+    previous.dataset.repeats = String(repeats);
+    previous.dataset.updatedAt = String(Date.now());
+    previous.querySelector(".repeat-count").textContent = " ×" + repeats;
+    nodes.chat.append(previous);
+  } else {
+    const line = element("div", "chat-line" + (type === "user" ? "" : " " + type));
+    line.dataset.eventKey = key;
+    line.dataset.updatedAt = String(Date.now());
+    line.dataset.repeats = "1";
+    const timestamp = element("span", "timestamp", new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }));
+    line.append(timestamp, element("b", "", author), document.createTextNode(" " + content), element("span", "repeat-count"));
+    nodes.chat.append(line);
+  }
+  while (nodes.chat.children.length > 7) nodes.chat.firstElementChild.remove();
   nodes.chat.scrollTop = nodes.chat.scrollHeight;
   notify(content);
 }
@@ -222,6 +276,7 @@ async function animateDuel(challenger, opponent) {
   $("resetDemo").disabled = true;
   $("sendChat").disabled = true;
   $("importLegacy").disabled = true;
+  for (const button of document.querySelectorAll("[data-quick]")) button.disabled = true;
   const result = runDuel(left, right);
   setFighter("fighterLeft", left, result.initialHealth[left.name]);
   setFighter("fighterRight", right, result.initialHealth[right.name]);
@@ -257,7 +312,7 @@ async function animateDuel(challenger, opponent) {
     duelCount += 1;
     persist();
     render();
-    logMessage("ARENA", result.winner + " venceu " + result.loser + " (+45 XP, +28 moedas)! " + result.loser + " recebeu 20 XP e 12 moedas.", "system");
+    logMessage("ARENA", result.winner + " venceu " + result.loser + " • +45 XP e 28 moedas.", "system");
     await pause(1100);
   } finally {
     nodes.duel.hidden = true;
@@ -266,6 +321,7 @@ async function animateDuel(challenger, opponent) {
     $("resetDemo").disabled = false;
     $("sendChat").disabled = live;
     $("importLegacy").disabled = live;
+    for (const button of document.querySelectorAll("[data-quick]")) button.disabled = live;
     fighting = false;
     render();
     if (liveQueue.length && live) setTimeout(flushLiveQueue, 150);
@@ -297,12 +353,24 @@ function submitCommand(sender, command, source = "demo") {
     if (userCooldown.size > 400) userCooldown.clear();
     userCooldown.set(name, now);
   }
-  logMessage(name, text);
   const outcome = applyCommand(players, name, text);
   players = outcome.players;
   persist();
   render();
-  logMessage("ARENA", outcome.event.text, outcome.event.type === "error" ? "error" : "system");
+  const commandType = text.split(/\s+/)[0].toLowerCase();
+  if (outcome.event.type === "info" && ["!perfil", "!inventario", "!inv", "!loja"].includes(commandType)) {
+    selectedName = name;
+    selectWorkspace("heroes");
+    const target = commandType === "!loja" ? document.querySelector(".shop-panel") : document.querySelector(".profile-panel");
+    if (target) target.scrollIntoView({ block: "nearest", behavior: "instant" });
+    notify(commandType === "!loja" ? "Loja aberta: veja itens e preços." : "Ficha e inventário abertos.");
+  } else if (outcome.event.type === "info" && ["!ajuda", "!help"].includes(commandType)) {
+    selectWorkspace("play");
+    $("advancedCommands").open = true;
+    notify("Veja a lista em Mais comandos e escolha uma ação.");
+  } else {
+    logMessage("ARENA", outcome.event.text, outcome.event.type === "error" ? "error" : "system");
+  }
   if (outcome.event.type === "duel") void animateDuel(outcome.event.challenger, outcome.event.opponent);
 }
 
@@ -312,6 +380,19 @@ $("chatForm").addEventListener("submit", event => {
   $("command").focus();
 });
 
+document.querySelectorAll("[data-quick]").forEach(button => {
+  button.addEventListener("click", () => {
+    const user = normalizeName($("username").value);
+    if (!user) { logMessage("ARENA", "Informe um nome de usuário válido.", "error"); return; }
+    if (button.dataset.quick === "join") submitCommand(user, "!entrar 1");
+    else if (button.dataset.quick === "train") submitCommand(user, "!treinar");
+    else if (button.dataset.quick === "duel") {
+      const opponent = players.find(player => player.name !== user);
+      if (opponent) submitCommand(user, "!duelo @" + opponent.name);
+      else logMessage("ARENA", "Crie pelo menos dois personagens antes do duelo.", "error");
+    }
+  });
+});
 document.querySelectorAll("[data-command]").forEach(button => {
   button.addEventListener("click", () => {
     $("command").value = button.dataset.command;
@@ -350,7 +431,7 @@ $("resetDemo").addEventListener("click", () => {
 });
 
 $("clearChat").addEventListener("click", () => {
-  nodes.chat.replaceChildren(element("p", "chat-placeholder", "Os eventos aparecerão aqui."));
+  nodes.chat.replaceChildren(element("p", "chat-placeholder", "Acontecimentos importantes aparecerão aqui."));
   notify("Historico visual do chat apagado.");
 });
 
@@ -372,7 +453,7 @@ $("importLegacy").addEventListener("click", () => {
 });
 
 render();
-logMessage("ARENA", "Demo offline iniciada. Use !entrar 1 ou Adicionar aventureiros.", "system");
+notify("Pronto para jogar. Clique em Entrar ou + Criar equipe.");
 
 
 // Twitch é opt-in: o modo offline segue jogável sem autenticação.
@@ -396,16 +477,14 @@ function updateTwitchStatus({ status, message, channel }) {
   $("resetDemo").disabled = live || fighting;
   $("importLegacy").disabled = live || fighting;
   $("liveModeNotice").hidden = !live;
+  for (const button of document.querySelectorAll("[data-quick]")) button.disabled = live || fighting;
   if (!live) { liveQueue.length = 0; userCooldown.clear(); }
 }
 twitchSession = new TwitchSession({
   onStatus: updateTwitchStatus,
   onChat: event => {
-    // Mensagens comuns aparecem no histórico; apenas comandos acionam o RPG.
-    if (!event.text.trimStart().startsWith("!")) {
-      logMessage(event.sender, event.text.slice(0, 160));
-      return;
-    }
+    // O painel é um resumo do RPG; conversas comuns continuam no chat Twitch.
+    if (!event.text.trimStart().startsWith("!")) return;
     submitCommand(event.sender, event.text.slice(0, 100), "twitch");
   },
   onReward: event => {
