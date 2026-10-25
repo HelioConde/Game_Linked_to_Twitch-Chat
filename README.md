@@ -142,6 +142,26 @@ Documentação oficial:
 [chat](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage).
 
 
+## Novos personagens — 20 skins de 2026
+
+As 20 novas artes de fantasia foram adicionadas em [img/characters-v2](./img/characters-v2/)
+como arquivos **WebP transparentes individuais** otimizados para a arena no navegador,
+com quatro atlas WebP também armazenados na mesma pasta.
+O catálogo e seus nomes ficam em [demo/skin-library.mjs](./demo/skin-library.mjs).
+
+As aparências são selecionadas com o mesmo comando existente: `!entrar 1` até
+`!entrar 20` ou `!skin 1` até `!skin 20`. Na Chat Arena, abra
+**20 novas aparências de aventureiros** para visualizar os personagens e preencher
+o comando clicando na skin. As novas imagens aparecem na arena, nas fichas, no
+ranking, nos duelos e no modo OBS. O jogo clássico de 2022 continua utilizando os
+arquivos originais `img/charB1.png` a `img/charB20.png`.
+
+Os novos arquivos representam personagens em **pose idle estática**, com pequenas
+animações de interface já existentes (movimento de idle e efeitos de combate).
+**Ainda não são spritesheets de caminhada e ataques em múltiplos quadros.**
+As artes PNG de maior resolução ficaram disponíveis em um pacote separado de
+originais para edição posterior.
+
 ## GitHub Pages e apresentação no OBS
 
 A nova versão fica na pasta [demo/](./demo/index.html); o jogo clássico continua no
