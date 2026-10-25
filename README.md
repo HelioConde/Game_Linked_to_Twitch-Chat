@@ -91,10 +91,53 @@ armas, armaduras e **quatro habilidades**: golpe, chama, cura e guarda.
 e também importa backups de 2022, sem alterar a chave original `players`.
 Continuamos usando armazenamento **local ao navegador**, não sincronizado na nuvem.
 
+
+### Etapa 4 — Twitch real (OAuth + EventSub WebSocket)
+
+A demo agora tem um painel opcional **Conectar chat real**: o motor do RPG
+continua o mesmo, mas os comandos podem ser recebidos pelo EventSub da Twitch,
+em vez de serem simulados. Nenhuma chave secreta é usada no código.
+
+**Como configurar:**
+
+1. Execute a demo em HTTPS ou use http://localhost:8000/demo/index.html.
+2. Acesse o [Twitch Developer Console](https://dev.twitch.tv/console/apps),
+   registre um aplicativo e configure a URL de redirecionamento **exatamente igual**
+   à exibida no painel da demo (exemplo local: http://localhost:8000/demo/index.html).
+   Para publicação, registre também o endereço HTTPS da demo publicada.
+3. Copie somente o **Client ID público** para a interface. Nunca insira Client Secret ou token.
+4. Clique em **Conectar Twitch** e autorize a conta proprietária do canal.
+5. Após o retorno, o app valida o token e assina os eventos channel.chat.message.
+6. No chat Twitch, envie !entrar 1, !treinar, !perfil, !duelo @usuario ou outros comandos.
+7. Mantenha a aba aberta durante a live. Use **Desconectar** para voltar à demo.
+
+**Escopos OAuth:** user:read:chat é obrigatório; channel:read:redemptions
+é opcional, somente se habilitar recompensas personalizadas. O mapeamento
+de recompensas usa os oito IDs conhecidos de 2022 em demo/twitch-protocol.mjs.
+Se esses IDs já foram recriados na Twitch, precisam ser atualizados no código.
+O jogo somente observa resgates e aplica efeitos locais: não cria, configura
+ou finaliza recompensas na plataforma Twitch.
+
+**Segurança:** state OAuth verificado, token validado na conexão e a cada hora,
+canal de origem validado, eventos duplicados ignorados, limite de comandos,
+política CSP e limpeza imediata do token no fragmento da URL.
+O access token fica somente na memória da aba. Recarregar exige nova
+autorização; o Client ID público pode ficar salvo localmente.
+
+**Limitações:** saves ainda ficam no localStorage do navegador, sem sincronização
+entre computadores; o app não roda 24/7 nem recebe mensagens com a aba fechada.
+O login e os eventos reais exigem um aplicativo registrado na Twitch.
+Os testes automatizados simulam a API, não comprovam conexão real.
+
+Documentação oficial:
+[OAuth](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/),
+[EventSub WebSockets](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/) e
+[chat](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage).
+
 ### Etapas da retomada
 
 1. Auditoria e correções iniciais do legado.
 2. Interface moderna e demo offline (implementadas, pendente de QA visual).
 3. Combate e progressão avançados (implementados, pendentes de QA visual completo).
-4. Integração Twitch moderna.
+4. Integração Twitch moderna (OAuth/EventSub implementados, verificação ao vivo pendente).
 5. Publicação, QA completo e modo OBS.
