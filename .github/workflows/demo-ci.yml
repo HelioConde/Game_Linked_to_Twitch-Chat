@@ -19,6 +19,7 @@ jobs:
           node --check js/script.js
           node --check demo/engine.mjs
           node --check demo/app.mjs
+          node --check demo/obs-mode.mjs
           node --check demo/twitch-protocol.mjs
           node --check demo/twitch-client.mjs
       - name: Testar motor da arena
@@ -32,3 +33,30 @@ jobs:
           test -f img/charB20.png
           test -f demo/twitch-client.mjs
           test -f demo/twitch-protocol.mjs
+          test -f demo/obs-mode.mjs
+
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Iniciar servidor HTTP local
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/chat-arena-http.log 2>&1 &
+          sleep 2
+      - name: QA visual desktop, mobile e overlay
+        run: node --test tests/browser.spec.mjs
+      - name: Guardar capturas do QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-screenshots
+          path: browser-artifacts/
+          if-no-files-found: ignore
