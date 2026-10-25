@@ -26,49 +26,28 @@
   </header>
 
   <main id="main" class="shell">
-    <section class="intro" aria-labelledby="page-title">
-      <div>
-        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 5.1</p>
-        <h1 id="page-title">Seu chat. <span>Uma arena.</span><br>Infinitas histórias.</h1>
-        <p class="subtitle">Ganhe experiência em treinos e duelos, compre equipamentos, escolha habilidades e dispute o ranking antes de integrar a Twitch.</p>
+    <div class="compact-title">
+      <div class="compact-heading">
+        <span class="eyebrow">GAME LINKED TO TWITCH CHAT</span>
+        <h1 id="page-title">Chat <span>Arena</span></h1>
       </div>
-      <div class="intro-note">
-        <span class="note-icon" aria-hidden="true">⌘</span>
-        <div><strong>Modo laboratório</strong><p>Teste em modo offline ou conecte sua conta Twitch pelo painel de autenticação.</p></div>
+      <div class="compact-metrics" aria-label="Resumo do jogo">
+        <div><strong id="stat-players">0</strong><span>Aventureiros</span></div>
+        <div><strong id="stat-duels">0</strong><span>Duelos</span></div>
+        <div><strong id="stat-level">0</strong><span>Nível máx.</span></div>
       </div>
-    </section>
-
-    <details class="skin-gallery-panel" id="skinsSection">
-      <summary class="skin-gallery-toggle">
-        <span class="skin-gallery-title"><strong>20 novas aparências de aventureiros</strong><small>Escolha um personagem para preencher o comando do chat.</small></span>
-        <span class="skin-gallery-action">Explorar personagens <span aria-hidden="true">▾</span></span>
-      </summary>
-      <div class="skin-gallery-body">
-        <p class="skin-gallery-help">Clique em um personagem. Use <code>!entrar N</code> para criá-lo ou <code>!skin N</code> para trocar a aparência de um jogador existente.</p>
-        <div class="skin-gallery-grid" id="skinGallery" aria-label="Galeria de vinte personagens"></div>
-      </div>
-    </details>
-
-    <section class="stats" aria-label="Resumo do jogo">
-      <div class="stat-card"><span>Aventureiros</span><strong id="stat-players">0</strong><small>Personagens criados</small></div>
-      <div class="stat-card"><span>Duelos</span><strong id="stat-duels">0</strong><small>Nesta sessão</small></div>
-      <div class="stat-card"><span>Maior nível</span><strong id="stat-level">0</strong><small>Progressão do grupo</small></div>
-      <div class="stat-card stat-highlight"><span>Integração</span><strong>SIMULADA</strong><small>Pronto para experimentar</small></div>
-    </section>
-
-
+    </div>
     <div id="obsBar" class="obs-bar" aria-label="Informações do overlay OBS" aria-live="polite">
       <div class="obs-brand">✦ CHAT ARENA <span id="obsConnection">DEMONSTRAÇÃO</span></div>
       <strong id="obsPlayerCount">0 aventureiros</strong>
     </div>
     <button type="button" id="obsExit" class="obs-exit" hidden aria-label="Sair do modo OBS">Sair do modo OBS · Esc</button>
-
     <div class="dashboard">
       <section class="main-column" aria-label="Jogo">
         <div class="panel arena-panel">
           <div class="panel-heading">
-            <div><p class="eyebrow">01 / MUNDO</p><h2>Arena dos aventureiros</h2></div>
-            <span class="tiny-label">Cenário e sprites originais de 2022</span>
+            <div><p class="eyebrow">MUNDO / EM TEMPO REAL</p><h2>Arena dos aventureiros</h2></div>
+            <span class="tiny-label">20 heróis disponíveis</span>
           </div>
           <div class="arena" id="arena" aria-label="Cenário dos personagens">
             <div class="scene-vignette"></div>
@@ -96,15 +75,106 @@
             </div>
           </div>
           <div class="arena-footer">
-            <span id="sceneCount" class="footnote">0 / 60 jogadores</span>
+            <div class="arena-status"><strong id="sceneCount" class="footnote">0 / 60 jogadores</strong><span id="activityHighlight">Comece adicionando aventureiros.</span></div>
             <div class="button-group">
               <button type="button" class="button button-soft" id="importLegacy" hidden>Importar personagens antigos</button>
-              <button type="button" class="button button-secondary" id="resetDemo">Limpar demo</button>
-              <button type="button" class="button button-primary" id="seedDemo">+ Adicionar aventureiros</button>
+              <button type="button" class="button button-secondary" id="resetDemo">Reiniciar</button>
+              <button type="button" class="button button-primary" id="seedDemo">+ Criar equipe</button>
             </div>
           </div>
         </div>
-        <div class="panel leaderboard-panel">
+      </section>
+      <aside class="side-column" aria-label="Controles da arena">
+        <div class="workspace-nav" role="tablist" aria-label="Seções do jogo">
+          <button type="button" class="workspace-tab" role="tab" aria-controls="panel-play" aria-selected="true" id="tab-play" data-workspace="play">Jogar</button>
+          <button type="button" class="workspace-tab" role="tab" aria-controls="panel-heroes" aria-selected="false" id="tab-heroes" data-workspace="heroes" tabindex="-1">Heróis</button>
+          <button type="button" class="workspace-tab" role="tab" aria-controls="panel-connect" aria-selected="false" id="tab-connect" data-workspace="connect" tabindex="-1">Twitch / OBS</button>
+        </div>
+        <div class="workspace-stack">
+          <div class="workspace-view" id="panel-play" role="tabpanel" aria-labelledby="tab-play">
+            <section class="panel simulator-panel" aria-labelledby="sim-title">
+          <div class="panel-heading">
+            <div><p class="eyebrow">CONTROLE / DEMO</p><h2 id="sim-title">Jogar agora</h2></div>
+            <span class="test-badge">● TEST MODE</span>
+          </div>
+          <p class="panel-description">Escolha uma ação ou digite um comando para testar o RPG.</p>
+<div class="quick-actions" aria-label="Ações rápidas">
+  <button type="button" data-quick="join"><span aria-hidden="true">✦</span> Entrar</button>
+  <button type="button" data-quick="train"><span aria-hidden="true">↗</span> Treinar</button>
+  <button type="button" data-quick="duel"><span aria-hidden="true">⚔</span> Duelo</button>
+</div>
+          <p id="liveModeNotice" class="live-mode-notice" hidden>Conectado ao chat real. Desconecte a Twitch para voltar a usar os comandos simulados.</p>
+          <form id="chatForm" novalidate>
+            <label for="username">Usuário da Twitch (simulado)</label>
+            <input id="username" name="username" maxlength="25" pattern="[a-zA-Z0-9_]+" placeholder="ex.: alchemy_flames" autocomplete="off" required value="alchemy_flames">
+            <label for="command">Mensagem no chat</label>
+            <div class="command-input">
+              <input id="command" name="command" maxlength="100" placeholder="!entrar 1" autocomplete="off" required>
+              <button type="submit" class="button button-primary" id="sendChat">Enviar <span aria-hidden="true">➜</span></button>
+            </div>
+          </form>
+          <details class="advanced-commands" id="advancedCommands"><summary>Mais comandos <span>▾</span></summary><p class="commands-caption">ATALHOS</p>
+          <div class="commands" aria-label="Preencher comando">
+            <button type="button" data-command="!entrar 1">!entrar 1</button>
+            <button type="button" data-command="!treinar">!treinar</button>
+            <button type="button" data-command="!perfil">!perfil</button>
+            <button type="button" data-command="!loja">!loja</button>
+            <button type="button" data-command="!comprar espada_ferro">!comprar espada_ferro</button>
+            <button type="button" data-command="!equipar espada_ferro">!equipar espada_ferro</button>
+            <button type="button" data-command="!habilidade chama">!habilidade chama</button>
+            <button type="button" data-command="!inventario">!inventario</button>
+            <button type="button" data-command="!skin 5">!skin 5</button>
+            <button type="button" data-command="!duelo @luci">!duelo @luci</button>
+            <button type="button" data-command="!ajuda">!ajuda</button>
+          </div>
+          </details>
+          <div class="chat-divider"></div>
+          <div class="chat-header"><strong>Últimos acontecimentos</strong><button type="button" class="text-action" id="clearChat">Limpar</button></div>
+          <div class="chat-feed" id="chatFeed" role="log" aria-live="polite" aria-relevant="additions" aria-label="Acontecimentos recentes">
+            <p class="chat-placeholder">Os eventos aparecerão aqui.</p>
+          </div>
+          <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+        </section>
+          </div>
+          <div class="workspace-view" id="panel-heroes" role="tabpanel" aria-labelledby="tab-heroes" hidden>
+            <details class="skin-gallery-panel" id="skinsSection">
+      <summary class="skin-gallery-toggle">
+        <span class="skin-gallery-title"><strong>20 novas aparências de aventureiros</strong><small>Escolha um personagem para preencher o comando do chat.</small></span>
+        <span class="skin-gallery-action">Explorar personagens <span aria-hidden="true">▾</span></span>
+      </summary>
+      <div class="skin-gallery-body">
+        <p class="skin-gallery-help">Clique em um personagem. Use <code>!entrar N</code> para criá-lo ou <code>!skin N</code> para trocar a aparência de um jogador existente.</p>
+        <div class="skin-gallery-grid" id="skinGallery" aria-label="Galeria de vinte personagens"></div>
+      </div>
+    </details>
+            <section class="panel roster-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">05 / ELENCO</p><h2>Personagens</h2></div>
+            <span id="rosterCount" class="tiny-label">0 registrados</span>
+          </div>
+          <div id="roster" class="roster"></div>
+          <p id="rosterEmpty" class="empty-copy">Crie um personagem com !entrar para começar.</p>
+        </section>
+            <section class="panel profile-panel" aria-labelledby="profile-heading">
+          <div class="panel-heading">
+            <div><p class="eyebrow">06 / HERÓI</p><h2 id="profile-heading">Ficha do aventureiro</h2></div>
+            <span class="tiny-label">Selecione “Ver perfil” na lista</span>
+          </div>
+          <p id="profileEmpty" class="empty-copy">Entre na arena para consultar sua ficha.</p>
+          <div id="profileContent" class="profile-content" hidden>
+            <div class="profile-name"><strong id="detailName"></strong><span id="detailLevel"></span></div>
+            <p id="detailStats" class="profile-stats"></p>
+            <div class="profile-xp-row"><span>Experiência</span><strong id="detailXp"></strong></div>
+            <div class="profile-xp-track" role="presentation"><div id="detailXpBar"></div></div>
+            <p id="detailGold" class="profile-gold"></p>
+            <p id="detailSkill" class="profile-detail"></p>
+            <p id="detailGear" class="profile-detail"></p>
+            <div class="inventory-label">Inventário</div>
+            <div id="detailInventory" class="inventory-items"></div>
+            <p class="profile-hint">Vitória: +45 XP / +28 moedas • Derrota: +20 XP / +12 moedas • Treino: +40 XP</p>
+          </div>
+        </section>
+            <div class="panel leaderboard-panel">
           <div class="panel-heading">
             <div><p class="eyebrow">02 / EVOLUÇÃO</p><h2>Hall dos campeões</h2></div>
             <span class="tiny-label">Ordenado por vitórias e nível</span>
@@ -112,27 +182,22 @@
           <ol id="leaderboard" class="leaderboard"></ol>
           <p id="leaderboardEmpty" class="empty-copy">Os primeiros campeões aparecerão aqui.</p>
         </div>
-      </section>
-
-      <aside class="side-column">
-        <section class="panel obs-settings-panel" aria-labelledby="obs-heading">
+            <section class="panel shop-panel" aria-labelledby="shop-heading">
           <div class="panel-heading">
-            <div><p class="eyebrow">OBS STUDIO / TRANSMISSÃO</p><h2 id="obs-heading">Modo overlay</h2></div>
-            <span class="test-badge">TRANSPARENTE</span>
+            <div><p class="eyebrow">07 / EQUIPAMENTOS</p><h2 id="shop-heading">Loja da arena</h2></div>
+            <span class="tiny-label">Moedas obtidas em duelos</span>
           </div>
-          <div class="obs-settings">
-            <p class="panel-description">Exiba personagens e combates sobre sua live, sem o painel ou fundo do cenário.</p>
-            <button type="button" class="button button-primary" id="obsEnter" aria-pressed="false">Ativar modo OBS nesta aba</button>
-            <p class="obs-help"><strong>Para chat real:</strong> conecte a Twitch acima, ative o modo OBS e no OBS Studio utilize <strong>Captura de janela</strong> desta mesma janela do navegador. Pressione <kbd>Esc</kbd> para voltar ao painel. A autenticação permanece na aba.</p>
-            <div class="obs-preview-box">
-              <strong>Browser Source (prévia offline)</strong>
-              <p>Abra a URL abaixo em uma fonte Navegador do OBS. Exibe personagens de demonstração, sem sincronizar o chat real ou tokens entre navegadores.</p>
-              <code id="obsPreviewUrl" class="twitch-redirect"></code>
-              <button type="button" id="obsCopy" class="button button-secondary">Copiar URL da prévia</button>
-            </div>
+          <div class="shop-list">
+            <div><strong>Espada de ferro</strong><small>+4 ataque</small><code>espada_ferro</code><b>65 moedas</b></div>
+            <div><strong>Couro reforçado</strong><small>+3 defesa</small><code>couro_reforcado</code><b>55 moedas</b></div>
+            <div><strong>Lâmina arcana</strong><small>+8 ataque</small><code>lamina_arcana</code><b>150 moedas</b></div>
+            <div><strong>Armadura de aço</strong><small>+7 defesa</small><code>armadura_aco</code><b>140 moedas</b></div>
           </div>
+          <p class="shop-hint">Digite <code>!comprar ITEM</code> e depois <code>!equipar ITEM</code>. Habilidades: golpe, chama, cura ou guarda.</p>
         </section>
-        <section class="panel twitch-panel" aria-labelledby="twitch-heading">
+          </div>
+          <div class="workspace-view" id="panel-connect" role="tabpanel" aria-labelledby="tab-connect" hidden>
+            <section class="panel twitch-panel" aria-labelledby="twitch-heading">
           <div class="panel-heading">
             <div><p class="eyebrow">03 / TWITCH EVENTSUB</p><h2 id="twitch-heading">Conectar chat real</h2></div>
             <span class="test-badge" id="twitchStatus" data-status="offline">OFFLINE</span>
@@ -156,86 +221,27 @@
             <p class="twitch-caution">Não cole Client Secret nem token de acesso. O token OAuth recebido fica somente em memória durante esta aba; ao recarregar, será preciso reconectar. Você autoriza o chat da própria conta Twitch conectada.</p>
           </div>
         </section>
-        <section class="panel simulator-panel" aria-labelledby="sim-title">
+            <section class="panel obs-settings-panel" aria-labelledby="obs-heading">
           <div class="panel-heading">
-            <div><p class="eyebrow">04 / PAINEL DE TESTE</p><h2 id="sim-title">Simulador de chat</h2></div>
-            <span class="test-badge">● TEST MODE</span>
+            <div><p class="eyebrow">OBS STUDIO / TRANSMISSÃO</p><h2 id="obs-heading">Modo overlay</h2></div>
+            <span class="test-badge">TRANSPARENTE</span>
           </div>
-          <p class="panel-description">Envie comandos como se fosse um espectador assistindo à transmissão.</p>
-          <p id="liveModeNotice" class="live-mode-notice" hidden>Conectado ao chat real. Desconecte a Twitch para voltar a usar os comandos simulados.</p>
-          <form id="chatForm" novalidate>
-            <label for="username">Usuário da Twitch (simulado)</label>
-            <input id="username" name="username" maxlength="25" pattern="[a-zA-Z0-9_]+" placeholder="ex.: alchemy_flames" autocomplete="off" required value="alchemy_flames">
-            <label for="command">Mensagem no chat</label>
-            <div class="command-input">
-              <input id="command" name="command" maxlength="100" placeholder="!entrar 1" autocomplete="off" required>
-              <button type="submit" class="button button-primary" id="sendChat">Enviar <span aria-hidden="true">➜</span></button>
+          <div class="obs-settings">
+            <p class="panel-description">Exiba personagens e combates sobre sua live, sem o painel ou fundo do cenário.</p>
+            <button type="button" class="button button-primary" id="obsEnter" aria-pressed="false">Ativar modo OBS nesta aba</button>
+            <p class="obs-help"><strong>Para chat real:</strong> conecte a Twitch acima, ative o modo OBS e no OBS Studio utilize <strong>Captura de janela</strong> desta mesma janela do navegador. Pressione <kbd>Esc</kbd> para voltar ao painel. A autenticação permanece na aba.</p>
+            <div class="obs-preview-box">
+              <strong>Browser Source (prévia offline)</strong>
+              <p>Abra a URL abaixo em uma fonte Navegador do OBS. Exibe personagens de demonstração, sem sincronizar o chat real ou tokens entre navegadores.</p>
+              <code id="obsPreviewUrl" class="twitch-redirect"></code>
+              <button type="button" id="obsCopy" class="button button-secondary">Copiar URL da prévia</button>
             </div>
-          </form>
-          <p class="commands-caption">COMANDOS DISPONÍVEIS</p>
-          <div class="commands" aria-label="Preencher comando">
-            <button type="button" data-command="!entrar 1">!entrar 1</button>
-            <button type="button" data-command="!treinar">!treinar</button>
-            <button type="button" data-command="!perfil">!perfil</button>
-            <button type="button" data-command="!loja">!loja</button>
-            <button type="button" data-command="!comprar espada_ferro">!comprar espada_ferro</button>
-            <button type="button" data-command="!equipar espada_ferro">!equipar espada_ferro</button>
-            <button type="button" data-command="!habilidade chama">!habilidade chama</button>
-            <button type="button" data-command="!inventario">!inventario</button>
-            <button type="button" data-command="!skin 5">!skin 5</button>
-            <button type="button" data-command="!duelo @luci">!duelo @luci</button>
-            <button type="button" data-command="!ajuda">!ajuda</button>
-          </div>
-          <div class="chat-divider"></div>
-          <div class="chat-header"><strong>Atividade ao vivo <span>(simulada)</span></strong><button type="button" class="text-action" id="clearChat">Limpar chat</button></div>
-          <div class="chat-feed" id="chatFeed" role="log" aria-live="polite" aria-relevant="additions" aria-label="Histórico de mensagens">
-            <p class="chat-placeholder">Os eventos aparecerão aqui.</p>
-          </div>
-          <p id="status" class="sr-only" role="status" aria-live="polite"></p>
-        </section>
-        <section class="panel roster-panel">
-          <div class="panel-heading">
-            <div><p class="eyebrow">05 / ELENCO</p><h2>Personagens</h2></div>
-            <span id="rosterCount" class="tiny-label">0 registrados</span>
-          </div>
-          <div id="roster" class="roster"></div>
-          <p id="rosterEmpty" class="empty-copy">Crie um personagem com !entrar para começar.</p>
-        </section>
-        <section class="panel profile-panel" aria-labelledby="profile-heading">
-          <div class="panel-heading">
-            <div><p class="eyebrow">06 / HERÓI</p><h2 id="profile-heading">Ficha do aventureiro</h2></div>
-            <span class="tiny-label">Selecione “Ver perfil” na lista</span>
-          </div>
-          <p id="profileEmpty" class="empty-copy">Entre na arena para consultar sua ficha.</p>
-          <div id="profileContent" class="profile-content" hidden>
-            <div class="profile-name"><strong id="detailName"></strong><span id="detailLevel"></span></div>
-            <p id="detailStats" class="profile-stats"></p>
-            <div class="profile-xp-row"><span>Experiência</span><strong id="detailXp"></strong></div>
-            <div class="profile-xp-track" role="presentation"><div id="detailXpBar"></div></div>
-            <p id="detailGold" class="profile-gold"></p>
-            <p id="detailSkill" class="profile-detail"></p>
-            <p id="detailGear" class="profile-detail"></p>
-            <div class="inventory-label">Inventário</div>
-            <div id="detailInventory" class="inventory-items"></div>
-            <p class="profile-hint">Vitória: +45 XP / +28 moedas • Derrota: +20 XP / +12 moedas • Treino: +40 XP</p>
           </div>
         </section>
-        <section class="panel shop-panel" aria-labelledby="shop-heading">
-          <div class="panel-heading">
-            <div><p class="eyebrow">07 / EQUIPAMENTOS</p><h2 id="shop-heading">Loja da arena</h2></div>
-            <span class="tiny-label">Moedas obtidas em duelos</span>
           </div>
-          <div class="shop-list">
-            <div><strong>Espada de ferro</strong><small>+4 ataque</small><code>espada_ferro</code><b>65 moedas</b></div>
-            <div><strong>Couro reforçado</strong><small>+3 defesa</small><code>couro_reforcado</code><b>55 moedas</b></div>
-            <div><strong>Lâmina arcana</strong><small>+8 ataque</small><code>lamina_arcana</code><b>150 moedas</b></div>
-            <div><strong>Armadura de aço</strong><small>+7 defesa</small><code>armadura_aco</code><b>140 moedas</b></div>
-          </div>
-          <p class="shop-hint">Digite <code>!comprar ITEM</code> e depois <code>!equipar ITEM</code>. Habilidades: golpe, chama, cura ou guarda.</p>
-        </section>
+        </div>
       </aside>
     </div>
-    <footer class="footer">GAME LINKED TO TWITCH CHAT · DEMO LOCAL <span>Desenvolvido a partir do projeto original • Twitch real opcional via OAuth/EventSub</span></footer>
   </main>
 </body>
 </html>
