@@ -66,10 +66,35 @@ O botão **Adicionar aventureiros** cria exemplos para testar. A demo mantém se
 
 O workflow [Validar jogo e demo](./.github/workflows/demo-ci.yml) verifica sintaxe JavaScript e executa testes com Node.js (comando: node --test tests/demo.test.mjs).
 
+### Etapa 3 — Progressão e combate RPG
+
+A demonstração inclui sistema de **experiência (XP)**, ganho de nível, **moedas**, inventário,
+armas, armaduras e **quatro habilidades**: golpe, chama, cura e guarda.
+
+- Treino: +40 XP. A cada nível, ataque, defesa, vida e velocidade aumentam em 1.
+- Vitória em duelo: +45 XP e +28 moedas.
+- Derrota: +20 XP e +12 moedas.
+- Equipamentos comprados são permanentes na demo local e modificam os atributos do combate.
+- As habilidades são ativadas automaticamente durante a batalha.
+- O perfil do aventureiro mostra XP, moedas, equipamento ativo, habilidades e inventário.
+
+| Comando | Ação |
+| --- | --- |
+| `!perfil` | Mostra seu progresso e histórico |
+| `!inventario` | Lista itens e os equipados |
+| `!loja` | Lista equipamentos à venda e preços |
+| `!comprar espada_ferro` | Compra item com moedas de combate |
+| `!equipar espada_ferro` | Equipa um item já comprado |
+| `!habilidade chama` | Escolhe habilidade ativa (golpe, chama, cura ou guarda) |
+
+**Compatibilidade:** a demo atualiza os saves criados nas versões anteriores
+e também importa backups de 2022, sem alterar a chave original `players`.
+Continuamos usando armazenamento **local ao navegador**, não sincronizado na nuvem.
+
 ### Etapas da retomada
 
 1. Auditoria e correções iniciais do legado.
 2. Interface moderna e demo offline (implementadas, pendente de QA visual).
-3. Combate e progressão avançados.
+3. Combate e progressão avançados (implementados, pendentes de QA visual completo).
 4. Integração Twitch moderna.
 5. Publicação, QA completo e modo OBS.

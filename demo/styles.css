@@ -129,3 +129,41 @@ form input:focus {border-color:var(--lime);box-shadow:0 0 0 2px #bdff7229;}
 @media(max-width:850px) {.dashboard {grid-template-columns:1fr;} .stats {grid-template-columns:repeat(2,minmax(0,1fr));} .arena {height:clamp(310px,56vw,460px);} }
 @media(max-width:550px) {.topbar {padding:12px 15px;} .brand strong {font-size:16px;} .brand small {font-size:8px;} .brand-mark {width:34px;height:34px;} .offline-pill {font-size:9px;} .link-button {display:none;} .shell {padding:25px 12px;} .intro h1 {font-size:34px;} .subtitle {font-size:12px;} .stats {gap:8px;} .stat-card {min-height:98px;padding:12px;} .stat-card strong {font-size:25px;} .stat-highlight strong {font-size:15px;} .panel-heading {padding:17px 15px 14px;align-items:start;flex-direction:column;} .panel-heading h2 {font-size:17px;} .arena {min-height:300px;} .arena-footer {padding:14px;align-items:stretch;} .button-group {justify-content:start;} .button {font-size:10px;} .hero {width:70px;} .hero-name {font-size:9px;max-width:70px;} .sprite {width:65px;height:65px;} .panel-description,form,.commands,.chat-header,.chat-feed {padding-left:15px;padding-right:15px;} .commands-caption {padding-left:15px;} .chat-divider {margin-left:15px;margin-right:15px;} .footer {flex-direction:column;} .footer span {text-align:left;} .fighter-sprite {width:95px;height:95px;} }
 @media(prefers-reduced-motion:reduce) {*,*::before,*::after {animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}
+
+
+/* Etapa 3: fichas, experiencia, equipamentos e animacoes de habilidade. */
+.roster-view { margin-left:auto;background:#292f48;border:1px solid #52607a;color:#d2def7;border-radius:7px;padding:7px 10px;font-size:10px;font-weight:800;white-space:nowrap; }
+.roster-view:hover,.roster-view[aria-pressed="true"] {border-color:var(--lime);color:var(--lime);}
+.roster-item {gap:8px;}
+.roster-item>div:nth-child(2) {min-width:0;flex:1;}
+.profile-content {padding:0 22px 22px;}
+.profile-name {display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;}
+.profile-name strong {font-size:18px;color:var(--lime);overflow-wrap:anywhere;}
+.profile-name span {font-size:11px;color:#b9c2d7;}
+.profile-stats {color:#dee4f3;font-size:12px;margin:13px 0;}
+.profile-xp-row {display:flex;justify-content:space-between;font-size:11px;color:#bac4dd;gap:8px;}
+.profile-xp-row strong {color:white;}
+.profile-xp-track {height:9px;background:#323951;border-radius:999px;overflow:hidden;margin:7px 0 15px;}
+.profile-xp-track>div {width:0;height:100%;background:linear-gradient(90deg,#8c80ff,var(--lime));transition:width .2s;}
+.profile-gold {font-size:15px;font-weight:850;color:#f3d47a;margin:0 0 10px;}
+.profile-detail {color:#c0c9e0;font-size:12px;overflow-wrap:anywhere;margin:8px 0;}
+.inventory-label {font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;margin:20px 0 8px;color:#bfc9dd;}
+.inventory-items {display:flex;flex-wrap:wrap;gap:7px;}
+.inventory-chip {border-radius:6px;padding:6px 8px;background:#202841;border:1px solid #3b4963;font-size:10px;color:#e6edfa;}
+.inventory-chip.equipped {border-color:#91b96f;color:var(--lime);}
+.profile-hint,.shop-hint {font-size:10px;line-height:1.8;color:#9ea9c4;margin:15px 0 0;}
+.shop-list {padding:0 22px;display:grid;gap:9px;}
+.shop-list>div {display:grid;grid-template-columns:1fr auto;gap:2px 10px;border:1px solid #343e5c;border-radius:9px;background:#1a2238;padding:10px 12px;}
+.shop-list strong {font-size:12px;}
+.shop-list small {text-align:right;color:#a0d68d;font-size:10px;}
+.shop-list code {font-size:10px;color:#9ea9c4;}
+.shop-list b {color:#f0d185;text-align:right;font-size:10px;}
+.shop-hint {padding:0 22px 19px;}
+.fighter-sprite.attacking {filter:drop-shadow(0 0 10px #ffef9c);animation:attackSwoop .23s ease-out;}
+.fighter-sprite.attacking.mirror {animation:mirrorAttackSwoop .23s ease-out;}
+.fighter-sprite.casting {filter:drop-shadow(0 0 18px #bd94ff) brightness(1.35);}
+.fighter-sprite.hit {filter:brightness(2) sepia(1) saturate(6) hue-rotate(310deg);}
+@keyframes attackSwoop {50% {transform:translateX(12px) scale(1.06);}}
+@keyframes mirrorAttackSwoop {50% {transform:scaleX(-1) translateX(12px) scale(1.06);}}
+@media(max-width:550px) {.profile-content,.shop-list {padding-left:15px;padding-right:15px;} .shop-hint {padding-left:15px;padding-right:15px;} .roster-view {font-size:9px;padding:6px 8px;} }
+@media(prefers-reduced-motion:reduce) {.fighter-sprite.attacking,.fighter-sprite.attacking.mirror {animation:none;}}

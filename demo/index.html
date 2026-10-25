@@ -25,9 +25,9 @@
   <main id="main" class="shell">
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 2.0</p>
+        <p class="eyebrow">GAME LINKED TO TWITCH CHAT / VERSÃO 3.0</p>
         <h1 id="page-title">Seu chat. <span>Uma arena.</span><br>Infinitas histórias.</h1>
-        <p class="subtitle">Crie aventureiros, evolua atributos e desafie outros jogadores. Teste todos os comandos antes de integrar a Twitch.</p>
+        <p class="subtitle">Ganhe experiência em treinos e duelos, compre equipamentos, escolha habilidades e dispute o ranking antes de integrar a Twitch.</p>
       </div>
       <div class="intro-note">
         <span class="note-icon" aria-hidden="true">⌘</span>
@@ -113,6 +113,12 @@
           <div class="commands" aria-label="Preencher comando">
             <button type="button" data-command="!entrar 1">!entrar 1</button>
             <button type="button" data-command="!treinar">!treinar</button>
+            <button type="button" data-command="!perfil">!perfil</button>
+            <button type="button" data-command="!loja">!loja</button>
+            <button type="button" data-command="!comprar espada_ferro">!comprar espada_ferro</button>
+            <button type="button" data-command="!equipar espada_ferro">!equipar espada_ferro</button>
+            <button type="button" data-command="!habilidade chama">!habilidade chama</button>
+            <button type="button" data-command="!inventario">!inventario</button>
             <button type="button" data-command="!skin 5">!skin 5</button>
             <button type="button" data-command="!duelo @luci">!duelo @luci</button>
             <button type="button" data-command="!ajuda">!ajuda</button>
@@ -131,6 +137,38 @@
           </div>
           <div id="roster" class="roster"></div>
           <p id="rosterEmpty" class="empty-copy">Crie um personagem com !entrar para começar.</p>
+        </section>
+        <section class="panel profile-panel" aria-labelledby="profile-heading">
+          <div class="panel-heading">
+            <div><p class="eyebrow">05 / HERÓI</p><h2 id="profile-heading">Ficha do aventureiro</h2></div>
+            <span class="tiny-label">Selecione “Ver perfil” na lista</span>
+          </div>
+          <p id="profileEmpty" class="empty-copy">Entre na arena para consultar sua ficha.</p>
+          <div id="profileContent" class="profile-content" hidden>
+            <div class="profile-name"><strong id="detailName"></strong><span id="detailLevel"></span></div>
+            <p id="detailStats" class="profile-stats"></p>
+            <div class="profile-xp-row"><span>Experiência</span><strong id="detailXp"></strong></div>
+            <div class="profile-xp-track" role="presentation"><div id="detailXpBar"></div></div>
+            <p id="detailGold" class="profile-gold"></p>
+            <p id="detailSkill" class="profile-detail"></p>
+            <p id="detailGear" class="profile-detail"></p>
+            <div class="inventory-label">Inventário</div>
+            <div id="detailInventory" class="inventory-items"></div>
+            <p class="profile-hint">Vitória: +45 XP / +28 moedas • Derrota: +20 XP / +12 moedas • Treino: +40 XP</p>
+          </div>
+        </section>
+        <section class="panel shop-panel" aria-labelledby="shop-heading">
+          <div class="panel-heading">
+            <div><p class="eyebrow">06 / EQUIPAMENTOS</p><h2 id="shop-heading">Loja da arena</h2></div>
+            <span class="tiny-label">Moedas obtidas em duelos</span>
+          </div>
+          <div class="shop-list">
+            <div><strong>Espada de ferro</strong><small>+4 ataque</small><code>espada_ferro</code><b>65 moedas</b></div>
+            <div><strong>Couro reforçado</strong><small>+3 defesa</small><code>couro_reforcado</code><b>55 moedas</b></div>
+            <div><strong>Lâmina arcana</strong><small>+8 ataque</small><code>lamina_arcana</code><b>150 moedas</b></div>
+            <div><strong>Armadura de aço</strong><small>+7 defesa</small><code>armadura_aco</code><b>140 moedas</b></div>
+          </div>
+          <p class="shop-hint">Digite <code>!comprar ITEM</code> e depois <code>!equipar ITEM</code>. Habilidades: golpe, chama, cura ou guarda.</p>
         </section>
       </aside>
     </div>
