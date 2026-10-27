@@ -20,6 +20,7 @@ jobs:
           node --check demo/engine.mjs
           node --check demo/app.mjs
           node --check demo/obs-mode.mjs
+          node --check demo/arena-motion.mjs
           node --check demo/twitch-protocol.mjs
           node --check demo/twitch-client.mjs
       - name: Testar motor da arena
@@ -34,6 +35,7 @@ jobs:
           test -f demo/twitch-client.mjs
           test -f demo/twitch-protocol.mjs
           test -f demo/obs-mode.mjs
+          test -f demo/arena-motion.mjs
 
   browser-qa:
     runs-on: ubuntu-latest
