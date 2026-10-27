@@ -451,3 +451,6 @@ body:not(.obs-mode) .footer {display:none;}
 }
 body.obs-mode .compact-title {display:none!important;}
 body.obs-mode .workspace-nav,body.obs-mode .workspace-stack {display:none!important;}
+
+/* OBS: garantir transparência real, inclusive no documento raiz. */
+html.obs-document, html.obs-document body.obs-mode { background-color: transparent !important; background-image: none !important; }

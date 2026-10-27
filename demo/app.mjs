@@ -19,9 +19,24 @@ const liveQueue = [];
 const userCooldown = new Map();
 let twitchSession = null;
 let live = false;
+function setTransparentOverlay(enabled) {
+  // OBS exige pixels transparentes em html e body, inclusive em navegadores
+  // que aplicam estilos do tema antes de recalcular a classe .obs-mode.
+  for (const element of [document.documentElement, document.body]) {
+    if (enabled) {
+      element.style.setProperty("background-color", "transparent", "important");
+      element.style.setProperty("background-image", "none", "important");
+    } else {
+      element.style.removeProperty("background-color");
+      element.style.removeProperty("background-image");
+    }
+  }
+}
+
 let overlayActive = readObsMode(window.location.search);
 document.body.classList.toggle("obs-mode", overlayActive);
 document.documentElement.classList.toggle("obs-document", overlayActive);
+setTransparentOverlay(overlayActive);
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -513,6 +528,7 @@ function toggleObsMode(force = !overlayActive) {
   overlayActive = Boolean(force);
   document.body.classList.toggle("obs-mode", overlayActive);
   document.documentElement.classList.toggle("obs-document", overlayActive);
+setTransparentOverlay(overlayActive);
   const target = viewUrl(window.location.href, overlayActive);
   window.history.replaceState(null, "", target.pathname + target.search);
   $("obsExit").hidden = !overlayActive;
