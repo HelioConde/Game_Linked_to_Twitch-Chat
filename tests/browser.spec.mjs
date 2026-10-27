@@ -175,3 +175,62 @@ test("atividade — repetição consolidada, sem duplicar comandos", async () =>
     assert.deepEqual(errors, []);
   } finally { await context.close(); }
 });
+
+
+test("arena viva — personagens se movem e podem ser selecionados por clique", async () => {
+  const context = await browser.newContext({viewport:{width:1440,height:900},reducedMotion:"no-preference"});
+  const page = await context.newPage();
+  const errors = [];
+  page.on("pageerror",error=>errors.push(error.message));
+  try {
+    await page.goto(base,{waitUntil:"networkidle"});
+    await page.locator("#seedDemo").click();
+    const actor=page.locator('.hero[data-player="luci"]');
+    assert.equal(await actor.count(),1);
+    const first=await actor.evaluate(node=>node.style.left);
+    await page.waitForTimeout(450);
+    const later=await actor.evaluate(node=>node.style.left);
+    assert.notEqual(first,later,"Avatar deve passear pelo cenário");
+    await actor.click();
+    assert.equal(await page.locator("#tab-heroes").getAttribute("aria-selected"),"true");
+    assert.equal(await page.locator("#detailName").textContent(),"luci");
+    assert.deepEqual(errors,[]);
+  } finally { await context.close(); }
+});
+
+test("duelo cinematico — acelerar/pular funciona sem duplicar recompensas", async () => {
+  const context = await browser.newContext({viewport:{width:1440,height:900},reducedMotion:"no-preference"});
+  const page = await context.newPage();
+  const errors = [];
+  page.on("pageerror",error=>errors.push(error.message));
+  try {
+    await page.goto(base,{waitUntil:"networkidle"});
+    await page.locator("#seedDemo").click();
+    await page.locator('[data-quick="duel"]').click();
+    await page.locator("#duelView").waitFor({state:"visible",timeout:3500});
+    await page.locator("#battleSpeed").click();
+    assert.equal(await page.locator("#battleSpeed").getAttribute("aria-pressed"),"true");
+    await page.locator("#battleSkip").click();
+    await page.locator("#duelView").waitFor({state:"hidden",timeout:7000});
+    assert.equal((await page.locator("#stat-duels").textContent()).trim(),"1");
+    const wins=await page.locator(".leaderboard .rank-info strong").allTextContents();
+    assert.equal(wins.filter(text=>text.includes("1 vitórias")).length,1);
+    assert.equal(await page.locator("#battleEffects").locator(".damage-float").count(),0);
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test("acessibilidade — movimento reduzido mantém arena estática e PvP funcional", async () => {
+  const {context,page,errors}=await open({width:1366,height:768});
+  try {
+    await page.locator("#seedDemo").click();
+    const actor=page.locator('.hero[data-player="luci"]');
+    const first=await actor.evaluate(node=>node.style.left);
+    await page.waitForTimeout(260);
+    assert.equal(await actor.evaluate(node=>node.style.left),first);
+    await page.locator('[data-quick="duel"]').click();
+    await page.locator("#duelView").waitFor({state:"hidden",timeout:10000});
+    assert.equal((await page.locator("#stat-duels").textContent()).trim(),"1");
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
