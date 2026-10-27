@@ -3,6 +3,7 @@ import { TwitchSession } from "./twitch-client.mjs";
 import { rewardToCommand } from "./twitch-protocol.mjs";
 import { readObsMode, readPreviewMode, overlayPosition, viewUrl } from "./obs-mode.mjs";
 import { SKINS, getSkin } from "./skin-library.mjs";
+import { arenaBase, arenaPosition, battleDelay } from "./arena-motion.mjs";
 
 const STORAGE_KEY = "twitch-chat-arena-demo-v1";
 const $ = id => document.getElementById(id);
@@ -20,6 +21,9 @@ const userCooldown = new Map();
 let twitchSession = null;
 let live = false;
 let overlayActive = readObsMode(window.location.search);
+let battleSpeed = 1;
+let skipBattleAnimation = false;
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 document.body.classList.toggle("obs-mode", overlayActive);
 document.documentElement.classList.toggle("obs-document", overlayActive);
 
@@ -131,29 +135,61 @@ function renderArena() {
   nodes.actors.replaceChildren();
   nodes.emptyArena.hidden = players.length > 0;
   $("sceneCount").textContent = players.length + " / " + MAX_PLAYERS + " jogadores" + (players.length > 12 ? " • 12 exibidos" : "");
-  players.slice(0, 12).forEach((player, index) => {
-    const hero = element("div", "hero");
-    const placement = overlayActive ? overlayPosition(index, Math.min(12, players.length)) :
-      { left: 10 + (index % 6) * 16 + "%", bottom: (index < 6 ? 11 : 48) + "%" };
-    if (!overlayActive) {
-      const rowSize = Math.min(6, players.length);
-      const currentRowCount = index < 6 ? rowSize : Math.min(6, players.length - 6);
-      const inRow = index < 6 ? index : index - 6;
-      placement.left = (12 + (inRow + 0.5) * 76 / currentRowCount) + "%";
-    }
-    hero.style.left = placement.left;
-    hero.style.bottom = placement.bottom;
+  const visible = players.slice(0, 12);
+  visible.forEach((player, index) => {
+    const hero = element("button", "hero");
+    hero.type = "button";
+    hero.dataset.player = player.name;
+    hero.dataset.index = String(index);
+    hero.setAttribute("aria-label", "Ver perfil de " + player.name + ", " + getSkin(player.skin).name);
+    hero.title = "Ver perfil de " + player.name;
+    const position = overlayActive ? overlayPosition(index, visible.length) : arenaBase(index, visible.length);
+    hero.style.left = overlayActive ? position.left : position.x + "%";
+    hero.style.bottom = overlayActive ? position.bottom : position.y + "%";
     hero.style.zIndex = index < 6 ? "3" : "2";
+    hero.classList.toggle("is-selected", selectedName === player.name);
     hero.append(element("span", "hero-name", player.name));
     hero.append(element("span", "hero-level", "NV " + player.level));
     const sprite = element("div", "sprite");
-    sprite.setAttribute("role", "img");
-    sprite.setAttribute("aria-label", getSkin(player.skin).name + " de " + player.name);
+    sprite.setAttribute("aria-hidden", "true");
     setSprite(sprite, player.skin);
     hero.append(sprite);
+    hero.addEventListener("click", () => {
+      selectedName = player.name;
+      selectWorkspace("heroes");
+      renderProfile();
+      nodes.actors.querySelectorAll(".hero").forEach(item =>
+        item.classList.toggle("is-selected", item.dataset.player === player.name));
+      notify("Ficha aberta: " + player.name + ".");
+    });
     nodes.actors.append(hero);
   });
 }
+
+// O loop atualiza apenas até 12 elementos, sem criar intervalos por jogador.
+let lastWorldFrame = 0;
+function animateWorld(time) {
+  requestAnimationFrame(animateWorld);
+  if (document.hidden || fighting || reducedMotion.matches || time - lastWorldFrame < 45) return;
+  lastWorldFrame = time;
+  const visible = players.slice(0, 12);
+  for (const hero of nodes.actors.children) {
+    const index = Number(hero.dataset.index);
+    const player = visible[index];
+    if (!player || hero.dataset.player !== player.name) continue;
+    const origin = arenaBase(index, visible.length);
+    const animated = arenaPosition(index, visible.length, player.name, time);
+    if (overlayActive) {
+      const overlay = overlayPosition(index, visible.length);
+      hero.style.left = (parseFloat(overlay.left) + (animated.x - origin.x) * 0.55) + "%";
+      hero.style.bottom = (parseFloat(overlay.bottom) + (animated.y - origin.y) * 0.7) + "%";
+    } else {
+      hero.style.left = animated.x + "%";
+      hero.style.bottom = animated.y + "%";
+    }
+  }
+}
+requestAnimationFrame(animateWorld);
 
 function renderLeaderboard() {
   nodes.leaderboard.replaceChildren();
@@ -266,12 +302,30 @@ function setFighter(prefix, player, health) {
   $(prefix + "Bar").style.width = "100%";
 }
 
+$("battleSpeed").addEventListener("click", () => {
+  if (!fighting) return;
+  battleSpeed = battleSpeed === 1 ? 2 : 1;
+  $("battleSpeed").setAttribute("aria-pressed", String(battleSpeed === 2));
+  $("battleSpeed").textContent = battleSpeed === 2 ? "1× velocidade" : "2× velocidade";
+});
+$("battleSkip").addEventListener("click", () => {
+  if (fighting) skipBattleAnimation = true;
+});
+
 async function animateDuel(challenger, opponent) {
   if (fighting) return;
   const left = players.find(player => player.name === challenger);
   const right = players.find(player => player.name === opponent);
   if (!left || !right) return;
   fighting = true;
+  battleSpeed = 1;
+  skipBattleAnimation = reducedMotion.matches;
+  $("battleSpeed").textContent = "2× velocidade";
+  $("battleSpeed").setAttribute("aria-pressed", "false");
+  $("battleSkip").disabled = false;
+  $("fighterLeft").classList.remove("winner", "loser");
+  $("fighterRight").classList.remove("winner", "loser");
+  $("battleEffects").replaceChildren();
   $("seedDemo").disabled = true;
   $("resetDemo").disabled = true;
   $("sendChat").disabled = true;
@@ -285,8 +339,9 @@ async function animateDuel(challenger, opponent) {
   nodes.duel.hidden = false;
   $("battleLog").textContent = "Preparando o combate...";
   try {
-    await pause(600);
+    await pause(skipBattleAnimation ? 0 : 260);
     for (const turn of result.turns) {
+      if (skipBattleAnimation) break;
       const targetPrefix = turn.target === left.name ? "fighterLeft" : "fighterRight";
       const sourcePrefix = turn.attacker === left.name ? "fighterLeft" : "fighterRight";
       $(targetPrefix + "Bar").style.width = Math.max(0, turn.health / result.initialHealth[turn.target] * 100) + "%";
@@ -296,27 +351,41 @@ async function animateDuel(challenger, opponent) {
       const targetSprite = $(targetPrefix + "Sprite");
       const sourceSprite = $(sourcePrefix + "Sprite");
       targetSprite.classList.toggle("hit", !turn.missed);
-      sourceSprite.classList.toggle("attacking", true);
-      sourceSprite.classList.toggle("casting", Boolean(turn.skill));
+      sourceSprite.classList.add(turn.skill ? "casting" : "attacking");
+      const popup = element("span", "damage-float" + (turn.critical ? " critical" : "") +
+        (turn.missed ? " miss" : "") + (turn.skill ? " magic" : ""),
+        turn.missed ? "ESQUIVOU" : (turn.critical ? "CRÍTICO " : "") + "−" + turn.damage);
+      popup.style.left = turn.target === left.name ? "25%" : "75%";
+      $("battleEffects").replaceChildren(popup);
       $("battleLog").textContent = turn.missed
         ? turn.attacker + " errou o ataque!"
         : turn.attacker + (turn.skill ? " usou " + turn.skill + " e" : "") +
           " causou " + turn.damage + " de dano" + (turn.critical ? " CRÍTICO" : "") +
           (turn.healing ? " • recuperou " + turn.healing + " PV" : "") + "!";
-      await pause(Math.max(95, 320 - result.turns.length * 2));
+      await pause(skipBattleAnimation ? 0 : battleDelay(result.turns.length, battleSpeed));
       targetSprite.classList.remove("hit");
       sourceSprite.classList.remove("attacking", "casting");
     }
+    // O resultado do motor é aplicado apenas uma vez, mesmo ao pular animações.
+    for (const [player, prefix] of [[left, "fighterLeft"], [right, "fighterRight"]]) {
+      const health = result.health[player.name];
+      $(prefix + "Hp").textContent = health + " PV";
+      $(prefix + "Bar").style.width = (health / result.initialHealth[player.name] * 100) + "%";
+      $(prefix).classList.add(player.name === result.winner ? "winner" : "loser");
+    }
+    $("battleEffects").replaceChildren();
     $("battleLog").textContent = "🏆 " + result.winner + " venceu o duelo!";
     players = settleDuel(players, result);
     duelCount += 1;
     persist();
     render();
     logMessage("ARENA", result.winner + " venceu " + result.loser + " • +45 XP e 28 moedas.", "system");
-    await pause(1100);
+    await pause(skipBattleAnimation ? 160 : 750);
   } finally {
     nodes.duel.hidden = true;
     nodes.actors.hidden = false;
+    $("battleEffects").replaceChildren();
+    $("battleSkip").disabled = true;
     $("seedDemo").disabled = false;
     $("resetDemo").disabled = false;
     $("sendChat").disabled = live;

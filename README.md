@@ -143,6 +143,25 @@ Documentação oficial:
 
 
 
+## Arena viva e combate visual — atualização 2026
+
+A Chat Arena ganhou movimento suave na arena: até 12 personagens visíveis passeiam
+de maneira independente, mantendo posição segura nas duas fileiras. A animação
+é leve e pausada enquanto ocorre um combate ou a aba está em segundo plano.
+O navegador respeita **prefers-reduced-motion**, mantendo os personagens parados
+quando o usuário prefere menos animação.
+
+É possível clicar em um personagem para abrir diretamente sua ficha na aba
+**Heróis**. Durante um duelo são exibidos efeitos temporários de dano, crítico
+e esquiva, além de dois controles: **2× velocidade** e **Pular animação**.
+Pular apenas a apresentação não altera a luta calculada, nem duplica vitórias,
+XP ou moedas. O modo OBS permanece compatível.
+
+O fluxo do jogo continua baseado em artes estáticas dos personagens;
+o movimento nesta etapa é de palco e efeitos de combate — não substitui
+spritesheets tradicionais de caminhada/ataque. Todos os testes de navegação
+e lógica estão em `tests/`.
+
 ## Interface focada — Chat Arena 5.2
 
 A experiência principal foi reorganizada para **caber em uma tela no desktop**

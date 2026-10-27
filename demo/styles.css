@@ -451,3 +451,68 @@ body:not(.obs-mode) .footer {display:none;}
 }
 body.obs-mode .compact-title {display:none!important;}
 body.obs-mode .workspace-nav,body.obs-mode .workspace-stack {display:none!important;}
+
+
+/* Etapa jogabilidade — heróis vivos e duelos cinematográficos, sem painéis extras */
+.arena-light {
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 55% 45% at 49% 77%,rgba(128,138,193,.14),transparent 85%);
+}
+.hero {
+  appearance:none;background:transparent;border:1px solid transparent;border-radius:11px;
+  color:inherit;padding:0;cursor:pointer;touch-action:manipulation;
+  transition:filter .17s ease;
+}
+.hero:is(:hover,:focus-visible) {filter:drop-shadow(0 6px 10px #09152c) drop-shadow(0 0 11px #baff8580);}
+.hero:focus-visible {outline:2px solid var(--lime);outline-offset:2px;}
+.hero.is-selected .hero-level {box-shadow:0 0 0 1px #baff76a1;}
+.hero:is(:hover,:focus-visible) .hero-name {color:var(--lime);}
+body:not(.obs-mode) .sprite {animation:bob 2s ease-in-out infinite;}
+.battle-topline {width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:16;position:relative;}
+.battle-controls {display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;}
+.battle-control {
+  background:#18233dc9;border:1px solid #61718e;color:#e4ecf7;border-radius:8px;
+  padding:8px 10px;font-size:11px;font-weight:850;white-space:nowrap;cursor:pointer;
+}
+.battle-control:hover,.battle-control:focus-visible {border-color:var(--lime);color:var(--lime);}
+.battle-control[aria-pressed="true"] {background:#b8fa78;color:#1b2d19;border-color:var(--lime);}
+.battle-effects {position:absolute;inset:0;pointer-events:none;z-index:11;}
+.damage-float {
+  position:absolute;top:37%;transform:translateX(-50%);font-weight:950;letter-spacing:.045em;
+  font-size:clamp(16px,2vw,28px);color:#ffe6b4;text-shadow:0 2px 3px #000,0 0 12px #ed6f45;
+  white-space:nowrap;animation:damageRise .46s ease-out forwards;
+}
+.damage-float.critical {color:#ffdf5f;text-shadow:0 2px 3px #000,0 0 20px #ff6c28;}
+.damage-float.magic {color:#e4b9ff;text-shadow:0 2px 3px #000,0 0 20px #b75bff;}
+.damage-float.miss {color:#bfe1f5;text-shadow:0 2px 3px #000;}
+@keyframes damageRise {
+  from {opacity:0;transform:translate(-50%,20px) scale(.84);}
+  22% {opacity:1;}
+  to {opacity:0;transform:translate(-50%,-34px) scale(1.13);}
+}
+.fighter {transition:filter .2s ease,opacity .2s ease;}
+.fighter.winner {filter:drop-shadow(0 0 20px #8be682aa);}
+.fighter.loser {opacity:.66;}
+.fighter-health>div {transition:width .17s ease;box-shadow:0 0 7px #9ef0797f;}
+body:not(.obs-mode) .battle-log {position:relative;z-index:12;max-width:90%;padding:8px 13px;border-radius:8px;background:#10172cba;font-size:clamp(11px,1vw,15px);}
+body.obs-mode .battle-topline {flex-direction:column;justify-content:center;gap:7px;}
+body.obs-mode .battle-control {background:#0a1429e6;border:1px solid #91a6bd;}
+body.obs-mode .damage-float {top:52%;}
+@media(max-width:650px) {
+  .battle-topline {align-items:center;gap:5px;flex-direction:column;}
+  .battle-control {font-size:10px;padding:6px 8px;}
+  .damage-float {font-size:13px;top:40%;}
+  .fighter-health {height:10px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .hero,.fighter,.fighter-health>div {transition:none!important;}
+  .damage-float {animation:none;opacity:1;}
+  body:not(.obs-mode) .sprite {animation:none!important;}
+}
+
+/* Garantia de transparência no mesmo frame da alternância para OBS. */
+html.obs-document,
+html.obs-document body.obs-mode {
+  background-color: transparent !important;
+  background-image: none !important;
+}
