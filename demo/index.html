@@ -50,12 +50,19 @@
             <span class="tiny-label">20 heróis disponíveis</span>
           </div>
           <div class="arena" id="arena" aria-label="Cenário dos personagens">
+            <div class="arena-light" aria-hidden="true"></div>
             <div class="scene-vignette"></div>
             <div class="arena-title">✦ VALE DOS AVENTUREIROS ✦</div>
             <div id="actors" class="actors"></div>
             <div id="emptyArena" class="arena-empty"><span aria-hidden="true">⚔</span><strong>A arena está vazia</strong><small>Use !entrar ou adicione aventureiros de demonstração.</small></div>
             <div id="duelView" class="duel-view" hidden aria-live="polite">
-              <div class="duel-heading"><span>⚔</span> DUELO EM ANDAMENTO <span>⚔</span></div>
+              <div class="battle-topline">
+                <div class="duel-heading"><span>⚔</span> DUELO NA ARENA <span>⚔</span></div>
+                <div class="battle-controls" aria-label="Controles da batalha">
+                  <button type="button" class="battle-control" id="battleSpeed" aria-pressed="false">2× velocidade</button>
+                  <button type="button" class="battle-control" id="battleSkip">Pular animação</button>
+                </div>
+              </div>
               <div class="fighters">
                 <div class="fighter" id="fighterLeft">
                   <strong id="fighterLeftName"></strong>
@@ -71,6 +78,7 @@
                   <small id="fighterRightHp"></small>
                 </div>
               </div>
+              <div class="battle-effects" id="battleEffects" aria-hidden="true"></div>
               <p id="battleLog" class="battle-log"></p>
             </div>
           </div>
