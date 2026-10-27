@@ -509,3 +509,10 @@ body.obs-mode .damage-float {top:52%;}
   .damage-float {animation:none;opacity:1;}
   body:not(.obs-mode) .sprite {animation:none!important;}
 }
+
+/* Garantia de transparência no mesmo frame da alternância para OBS. */
+html.obs-document,
+html.obs-document body.obs-mode {
+  background-color: transparent !important;
+  background-image: none !important;
+}
